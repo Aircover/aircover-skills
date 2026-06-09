@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.DS_Store
+dist/
+*.skill
+# local test artifacts
+values.json
+*-test.xlsx
+"Mutual Action Plan - *.xlsx"
+~$*

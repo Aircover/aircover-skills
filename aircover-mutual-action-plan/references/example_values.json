@@ -1,0 +1,17 @@
+{
+  "overview": {
+    "account":       {"value": "Acme Corp",                              "sourced": true},
+    "project":       {"value": "Acme_Platform Expansion 2026",           "sourced": true},
+    "objective":     {"value": "Reduce new-rep ramp time by 30% by Q4",  "sourced": true},
+    "our_sponsor":   {"value": "Alex Rivera (VP Sales)",                   "sourced": true},
+    "their_sponsor": {"value": "[Customer Champion / EB]",               "sourced": false},
+    "go_live":       {"value": "2026-10-01",                             "sourced": true}
+  },
+  "action_items": [
+    {"row": 12, "status": "In Progress", "owner_us": "AE / SC", "owner_them": "Maria Chen, VP Sales",  "notes": "Objectives: cut new-rep ramp time, lift win rates, improve forecast accuracy. Success criteria to be defined. Recommended based on the customer's needs: 30% faster ramp, +5pt win rate, forecast within 10%."},
+    {"row": 13, "status": "Complete",    "owner_them": "Maria Chen, VP Sales", "notes": "Agreed evaluation path: committee demo, shortlist to two, 2-week trials, committee vote, final approval."},
+    {"row": 14, "status": "In Progress", "owner_them": "IT / Security", "notes": "SOC 2 under review with their infosec team"},
+    {"row": 16, "status": "In Progress", "notes": "POC scope drafted, awaiting Champion sign-off"},
+    {"row": 23, "status": "At Risk",     "notes": "Procurement freeze until new fiscal year; confirming timing"}
+  ]
+}

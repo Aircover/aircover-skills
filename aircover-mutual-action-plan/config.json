@@ -1,0 +1,56 @@
+{
+  "_comment": "Everything a new Aircover customer might change lives here. The engine (fill_map.py) reads this and stays template-agnostic. Swap the template, adjust the cell map, or pin an agent without touching code.",
+
+  "environment": {
+    "name": "Production",
+    "api_host": "api.aircover.ai",
+    "app_host": "app.aircover.ai"
+  },
+
+  "agent": {
+    "_comment": "How the skill finds the qualification/discovery agent at runtime. It calls list_agents and matches. Set pinned_template_id to lock to a specific agent and skip discovery.",
+    "pinned_template_id": null,
+    "category": "qualification",
+    "title_keywords": ["qualification", "meddpicc", "meddic", "discovery", "lead qual"]
+  },
+
+  "template": {
+    "file": "Mutual_Action_Plan_TEMPLATE.xlsx",
+    "sheet": "Mutual Action Plan"
+  },
+
+  "overview_cells": {
+    "account": "B5",
+    "project": "B6",
+    "objective": "B7",
+    "our_sponsor": "F5",
+    "their_sponsor": "F6",
+    "go_live": "F7"
+  },
+
+  "go_live_field": "go_live",
+
+  "item_cols": {
+    "action": "C",
+    "owner_us": "D",
+    "owner_them": "E",
+    "days_before": "F",
+    "status": "H",
+    "notes": "I"
+  },
+  "first_item_row": 12,
+  "last_item_row": 28,
+
+  "value_colors": {
+    "sourced": "FF1F2937",
+    "placeholder": "FF6B7280"
+  },
+
+  "status_styles": {
+    "Complete":    {"font": "FF166534", "fill": "FFDCFCE7"},
+    "In Progress": {"font": "FF854D0E", "fill": "FFFEF9C3"},
+    "Not Started": {"font": "FF6B7280", "fill": "FFF3F4F6"},
+    "At Risk":     {"font": "FF991B1B", "fill": "FFFEE2E2"},
+    "Blocked":     {"font": "FF991B1B", "fill": "FFFEE2E2"}
+  }
+}
