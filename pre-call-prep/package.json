@@ -1,0 +1,12 @@
+{
+  "name": "pre-call-prep-skill",
+  "version": "1.0.0",
+  "description": "Aircover pre-call prep skill: builds a pre-call prep .docx from Aircover meeting data.",
+  "license": "MIT",
+  "scripts": {
+    "build:example": "node scripts/build_prep_doc.js --input examples/prep_data.example.json --out sample.docx"
+  },
+  "dependencies": {
+    "docx": "^9.7.1"
+  }
+}

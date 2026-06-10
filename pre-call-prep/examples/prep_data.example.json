@@ -1,0 +1,59 @@
+{
+  "company": "Acme Robotics",
+  "meeting_date": "Thu Jun 18, 1:30-2:00 PM ET",
+  "attendees": [
+    { "name": "Jordan Lee", "title": "SF Admin" },
+    { "name": "Sam Rivera", "title": "Sr. Mgr, Sales Ops" }
+  ],
+  "call_number": 3,
+  "deal": { "amount": "$30,000", "close_date": "9/30/2026", "stage": "1 - Qualification" },
+  "action_items": {
+    "ours": [
+      "Send SOC 2 Type 2 and DPA (committed Jun 9)",
+      "Send calendar invite for Jun 18 (done)"
+    ],
+    "theirs": [
+      "Sam to send the standard NDA (committed Jun 9, not yet confirmed)",
+      "Sam to form evaluation committees within 2 weeks of Jun 9"
+    ],
+    "joint": [
+      "Start EU legal review in parallel (needs NDA and security docs exchanged first)",
+      "Target demo with the sales technology committee around July 4"
+    ]
+  },
+  "account_hierarchy": "Alex Chen, Chief Customer Officer\n  Pat Morgan, Sales VP\n    Senior Sales Managers (2 per region x 4 regions)\n      ~60 field reps\n  Jordan Lee, Sales Ops (SF Admin)\n    Sam Rivera, Sr. Mgr, Sales Ops  <-- CHAMPION",
+  "what_matters": "Sam wants to start legal and security review before the committee evaluates. That is champion behavior: he is clearing blockers so the committee path is clean. Protect this momentum. Get Jordan aligned on the Salesforce package and get the security docs moving.",
+  "contact_priorities": [
+    { "name": "Jordan Lee", "priorities": [
+      "Salesforce-first experience, avoid another UI",
+      "No conflicts with existing flows and custom objects",
+      "Understand the managed package architecture"
+    ] },
+    { "name": "Sam Rivera", "priorities": [
+      "Prospecting efficiency with signals landing in Salesforce",
+      "Hunter-to-farmer handoff data during the regional pilot",
+      "Coaching scores as a gamification lever for tenured reps"
+    ] }
+  ],
+  "landmines": [
+    { "label": "Privacy", "detail": "Reps in Canada and Europe, risk-averse buyer. Lead with transcription-only and mention per-region configurability." },
+    { "label": "Data ownership", "detail": "Bad prior vendor experience. Be explicit about data ownership in the contract." },
+    { "label": "Exec timing", "detail": "Do not push the executive meeting. The champion controls the internal sequence." }
+  ],
+  "objectives": [
+    "Get Jordan comfortable with the managed package approach and share docs for review",
+    "Confirm NDA status, and nudge if it has not been sent",
+    "Commit to sending SOC 2 and DPA post-call so the EU legal review starts",
+    "Align on committee, demo, and pilot timeline"
+  ],
+  "success_criteria": [
+    "Jordan comfortable reviewing managed package docs",
+    "NDA path confirmed",
+    "Security package requested or accepted",
+    "Clear next meeting scheduled"
+  ],
+  "meeting_links": [
+    { "label": "Call #1 (May 28)", "url": "https://app.aircover.ai/meetings/00000000000000000000000000000001" },
+    { "label": "Call #2 (Jun 9)", "url": "https://app.aircover.ai/meetings/00000000000000000000000000000002" }
+  ]
+}

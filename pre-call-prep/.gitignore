@@ -1,0 +1,12 @@
+# Node
+node_modules/
+package-lock.json
+
+# Build + run artifacts
+/Pre-Call_Prep_*.docx
+prep_data.json
+*.pdf
+*.jpg
+
+# OS
+.DS_Store
