@@ -1,0 +1,11 @@
+# Python
+__pycache__/
+*.pyc
+
+# Build + run artifacts
+sentiment_results.jsonl
+/Customer_Sentiment_Report.xlsx
+*.pdf
+
+# OS
+.DS_Store
