@@ -12,6 +12,7 @@ Aircover.
 |---|---|
 | [`aircover-mutual-action-plan`](aircover-mutual-action-plan/) | Generates a completed Mutual Action Plan (MAP) spreadsheet for a deal: the shared, dated roadmap from discovery to go-live, filled from the account, opportunity, sponsors, target go-live date, and current deal progress. |
 | [`pre-call-prep`](pre-call-prep/) | Generates a pre-call prep Word document for an upcoming meeting: reads the last 2-4 Aircover transcripts to build deal context, open action items, stakeholder priorities, landmines, and a suggested agenda. |
+| [`product-sentiment-tracker`](product-sentiment-tracker/) | Generates a Customer Product Sentiment report (Excel) from Aircover agent results across meetings: product requests, gaps, feature adoption, competitive intel, and integration asks, aggregated by account. |
 
 ## Install a skill
 
