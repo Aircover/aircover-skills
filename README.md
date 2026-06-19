@@ -1,62 +1,50 @@
 # Aircover Skills
 
-Installable [Claude Skills](https://www.anthropic.com/news/skills) built on the
-Aircover MCP. Each skill turns live Aircover deal, meeting, and agent data into a
-finished work product. Skills are self-contained: everything org-specific lives in
-each skill's `config.json`, so the same skill works for any company whose team uses
-Aircover.
+Turn your Aircover calls into finished work in seconds. Each skill is a ready-made tool you add to Claude once, then use by just asking in plain English. No setup, no coding, no GitHub knowledge needed.
 
-## Skills in this repo
+**Pick a skill below, click Download, add it to Claude, and ask.** You get a polished, ready-to-share document back.
 
-| Skill | What it does |
-|---|---|
-| [`aircover-mutual-action-plan`](aircover-mutual-action-plan/) | Generates a completed Mutual Action Plan (MAP) spreadsheet for a deal: the shared, dated roadmap from discovery to go-live, filled from the account, opportunity, sponsors, target go-live date, and current deal progress. |
-| [`pre-call-prep`](pre-call-prep/) | Generates a pre-call prep Word document for an upcoming meeting: reads the last 2-4 Aircover transcripts to build deal context, open action items, stakeholder priorities, landmines, and a suggested agenda. |
-| [`product-sentiment-tracker`](product-sentiment-tracker/) | Generates a Customer Product Sentiment report (Excel) from Aircover agent results across meetings: product requests, gaps, feature adoption, competitive intel, and integration asks, aggregated by account. |
+## How to add a skill (about 2 minutes, one time)
 
-## Install a skill
+1. Click the **Download** link for the skill you want (below). A `.skill` file saves to your computer.
+2. In Claude, go to **Customize > Skills** (or, for your whole team, **Organization settings > Skills**).
+3. Click **Add skill** and choose the file you just downloaded.
+4. The first time you use it, Claude asks you to connect your Aircover account. Log in once.
 
-**One-click:** download the skill's `.skill` file from this repo's
-[Releases](../../releases) and add it under Customize > Skills (personal) or
-Organization settings > Skills (org-wide, on Team or Enterprise). Each user logs
-into the Aircover connector once.
+That's it. Then just type what you want, for example:
+- "Build a mutual action plan for Acme."
+- "Prep me for my next call with Acme."
+- "Give me a product sentiment report for the last 30 days."
 
-**Build from source:** each skill ships a standard-library packager (no
-dependencies). From inside the skill's folder:
-```
-cd aircover-mutual-action-plan
-python package.py dist
-```
-This writes `dist/<skill-name>.skill`, ready to upload under Customize > Skills.
+## The skills
 
-## Requirements
+### Mutual Action Plan
+A shared, dated roadmap from first call to go-live, built from your deal in Aircover. Use it to align with a buyer on next steps.
+**You get:** a clean Excel plan with owners, due dates, and status, ready to share with the customer.
+**[Download Mutual Action Plan](https://github.com/Aircover/aircover-skills/releases/download/aircover-mutual-action-plan-v1.0.0/aircover-mutual-action-plan.skill)**
 
-- The Aircover connector connected (Production by default; see each skill's
-  `config.json` to change environment).
-- Code execution / file creation enabled in the client.
-- Any Python dependencies a skill names in its README (for example openpyxl).
+*(screenshot goes here)*
 
-## Repo layout
+### Pre-Call Prep
+A one-page briefing for your next meeting, built from your last few calls. Read it in five minutes before you dial in.
+**You get:** a Word doc with open action items, what each stakeholder cares about, landmines to avoid, and your goals for the call.
+**[Download Pre-Call Prep](https://github.com/Aircover/aircover-skills/releases/download/pre-call-prep-v1.0.0/pre-call-prep.skill)**
 
-```
-.
-  README.md                      this index
-  LICENSE                        repo license (MIT)
-  aircover-mutual-action-plan/   one self-contained skill (SKILL.md at its root)
-    SKILL.md  config.json  README.md  LICENSE  package.py
-    scripts/  assets/  references/
-```
+*(screenshot goes here)*
 
-Each skill folder is independently buildable and installable. To add a new skill,
-drop a new self-contained folder alongside the existing ones and add a row to the
-table above.
+### Product Sentiment Report
+A roll-up of what customers are asking for across all your calls: feature requests, gaps, and competitor mentions, grouped by account.
+**You get:** a six-tab Excel report you can take to product and leadership.
+**[Download Product Sentiment Report](https://github.com/Aircover/aircover-skills/releases/download/product-sentiment-tracker-v1.0.0/product-sentiment-tracker.skill)**
 
-## License
+*(screenshot goes here)*
 
-MIT (see [`LICENSE`](LICENSE)). Each skill folder also carries its own license.
+## Good to know
 
-## Privacy
+- Everything runs on your own Aircover data. Nothing is stored anywhere else.
+- Free to use across your team (MIT licensed).
+- Questions, or a skill you wish existed? Reach out to Dave.
 
-Skills read deal, meeting, and agent data from the connected Aircover account at
-run time. Nothing is stored or sent anywhere else. Run against your own org's data
-only.
+---
+
+*Building or customizing a skill? See each skill's folder for its `SKILL.md`, source, and a `package.py` / `package_skill.py` to rebuild the installable file.*
