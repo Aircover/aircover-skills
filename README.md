@@ -23,21 +23,24 @@ A shared, dated roadmap from first call to go-live, built from your deal in Airc
 **You get:** a clean Excel plan with owners, due dates, and status, ready to share with the customer.
 **[Download Mutual Action Plan](https://github.com/Aircover/aircover-skills/releases/download/aircover-mutual-action-plan-v1.0.0/aircover-mutual-action-plan.skill)**
 
-*(screenshot goes here)*
+<img width="1037" height="617" alt="image" src="https://github.com/user-attachments/assets/3014eb72-e2d9-42a7-a389-7604b6fb7b68" />
+
 
 ### Pre-Call Prep
 A one-page briefing for your next meeting, built from your last few calls. Read it in five minutes before you dial in.
 **You get:** a Word doc with open action items, what each stakeholder cares about, landmines to avoid, and your goals for the call.
 **[Download Pre-Call Prep](https://github.com/Aircover/aircover-skills/releases/download/pre-call-prep-v1.0.0/pre-call-prep.skill)**
 
-*(screenshot goes here)*
+<img width="1616" height="1322" alt="image" src="https://github.com/user-attachments/assets/87c21e02-25ae-48f2-82f5-0695e79af637" />
+
 
 ### Product Sentiment Report
 A roll-up of what customers are asking for across all your calls: feature requests, gaps, and competitor mentions, grouped by account.
 **You get:** a six-tab Excel report you can take to product and leadership.
 **[Download Product Sentiment Report](https://github.com/Aircover/aircover-skills/releases/download/product-sentiment-tracker-v1.0.0/product-sentiment-tracker.skill)**
 
-*(screenshot goes here)*
+<img width="1326" height="359" alt="image" src="https://github.com/user-attachments/assets/1d5db9aa-4ac5-4046-a53d-08b388a69771" />
+
 
 ## Good to know
 
