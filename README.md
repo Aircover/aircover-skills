@@ -41,6 +41,7 @@ A roll-up of what customers are asking for across all your calls: feature reques
 
 <img width="1326" height="359" alt="image" src="https://github.com/user-attachments/assets/1d5db9aa-4ac5-4046-a53d-08b388a69771" />
 
+| [`path-to-quota`](path-to-quota/) | Builds an end-of-quarter pipeline strategy (Word doc with charts) from your Aircover meetings and CRM: scores open deals on qualification (MEDDPICC/BANT) and close readiness, analyzes momentum, and delivers a prioritized close plan with per-deal strategies. |
 
 ## Good to know
 
