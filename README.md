@@ -41,7 +41,13 @@ A roll-up of what customers are asking for across all your calls: feature reques
 
 <img width="1326" height="359" alt="image" src="https://github.com/user-attachments/assets/1d5db9aa-4ac5-4046-a53d-08b388a69771" />
 
-| [`path-to-quota`](path-to-quota/) | Builds an end-of-quarter pipeline strategy (Word doc with charts) from your Aircover meetings and CRM: scores open deals on qualification (MEDDPICC/BANT) and close readiness, analyzes momentum, and delivers a prioritized close plan with per-deal strategies. |
+### Path to Quota
+An end-of-quarter game plan built from your meetings and pipeline. It scores every open deal, ranks them, and tells you exactly what to do to hit your number.
+**You get:** a Word doc with a prioritized deal list, per-deal close strategies, and charts.
+**[Download Path to Quota](https://github.com/Aircover/aircover-skills/releases/download/path-to-quota-v1.0.0/path-to-quota.skill)**
+
+<img width="684" height="820" alt="image (12)" src="https://github.com/user-attachments/assets/2ed8069a-07c4-4719-a1d3-670194ed6e2f" />
+
 
 ## Good to know
 
