@@ -3,7 +3,7 @@
 
 # Aircover Skills
 
-Turn your Aircover calls into finished work in seconds. Each skill is a ready-made tool you add to Claude once, then use by just asking in plain English. No setup, no coding, no GitHub knowledge needed.
+Turn your Aircover calls into finished work in seconds. These skills are purpose-built for Aircover: they draw on your call transcripts, AI agent analysis, calendar, and connected Salesforce data to streamline key seller workflows. Add a skill to Claude once, then use it by just asking in plain English. No setup, no coding, no GitHub knowledge needed.
 
 **Pick a skill below, click Download, add it to Claude, and ask.** You get a polished, ready-to-share document back.
 
@@ -17,6 +17,12 @@ Aircover account before they'll work.
 
 If your admin already enabled Aircover for your whole team, you may just be asked to
 log in the first time you run a skill.
+
+**Don't see Aircover in your connector list?** It needs to be set up for your
+account once. Follow the quick setup at
+[Aircover MCP settings](https://app.aircover.ai/integrations/mcp-settings)
+(under 5 minutes). If you don't have admin permissions in Aircover, send that
+link to your Aircover admin and they can turn it on.
 
 ## How to add a skill (about 2 minutes, one time)
 
