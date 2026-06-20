@@ -1,6 +1,6 @@
 ---
 name: path-to-quota
-description: Build a personalized end-of-quarter pipeline strategy from Aircover meeting data, CRM deal stages, MEDDPICC qualification scoring, and Deal Readiness Scorecard (close mechanics). Prompts for quota and EOQ date, finds all customer meetings in the quarter, prioritizes deals by qualification depth, close readiness, and meeting momentum, and delivers per-deal close strategies with next steps. Use this when someone says "path to quota", "how do I hit my number", "quarter close plan", "pipeline strategy", "what deals should I focus on", or wants a plan to close their open pipeline.
+description: Build a personalized end-of-quarter pipeline strategy from Aircover meeting data, CRM deal stages, MEDDPICC qualification scoring, and Deal Readiness Scorecard (close mechanics). Prompts for quota and EOQ date, finds all customer meetings in the quarter, prioritizes deals by qualification depth, close readiness, and meeting momentum, and delivers a .docx close plan with embedded charts, per-deal strategies, and next steps. Use this when someone says "path to quota", "how do I hit my number", "quarter close plan", "pipeline strategy", "what deals should I focus on", or wants a plan to close their open pipeline.
 ---
 
 # Path to Quota
@@ -9,7 +9,8 @@ Build an actionable end-of-quarter pipeline strategy. Pulls all customer meeting
 
 ## Requirements
 - The **Aircover Production** connector must be connected. All meeting and deal data comes from there.
-- **Code execution / file creation** must be on (for the output document).
+- **Code execution / file creation** must be on (for charts and the output document).
+- **Docx skill** (`/mnt/skills/public/docx/SKILL.md`) must be available. Read it before generating the output. Install with `npm install -g docx`. The output is a .docx file with embedded charts (not markdown), so it opens cleanly in Google Drive, Word, and other editors.
 - **Salesforce connector** is optional but recommended. When connected, provides a secondary validation that deals are still open and close dates fall within the quarter. Without it, the skill uses the CRM block from Aircover's get_deal (which mirrors SFDC fields).
 - **Web search** is not required.
 
@@ -134,7 +135,19 @@ Search the results in this priority order:
 
 Tell the user which qualification agent was selected (or that none was found).
 
-If a qualification agent exists, pull deal-level qualification for each open deal:
+If a qualification agent exists, pull deal-level qualification for **every** open deal. No exceptions, no skipping.
+
+**CRITICAL: 100% deal coverage is mandatory.**
+Do not stop scoring partway through the deal list due to context length, response size, or any other reason. Every open deal must have a qualification score or an explicit "agent returned no data" status. If you find yourself considering skipping deals, that is the signal to use the context management strategy below.
+
+**Context management strategy for qualification pulls:**
+The `get_qualification_results` response can be large (especially for deals with many meetings). To prevent context overflow:
+1. Call `get_qualification_results(deal_key, qual_template_id)` for one deal at a time.
+2. Immediately extract ONLY the numbers you need: for each dimension, read the `title`, `score`, and `max_score`. Optionally read the `result` text for weak dimensions only (score < 50% of max) to inform coaching recommendations later.
+3. Write the extracted scores to a running tally (a simple data structure or a file on disk if context is tight).
+4. Do NOT hold the full raw response in working memory. Extract, store the numbers, move to the next deal.
+5. If a single deal's response is extremely large (20+ meetings of history), extract the deal-level scores from the response and move on. The deal-level scores are what matter, not the per-meeting history.
+
 ```
 get_qualification_results(deal_key, qual_template_id)
 ```
@@ -147,10 +160,12 @@ For each deal, compute:
 - `qual_total_score` = sum of scored dimensions (where max_score > 0)
 - `qual_max_possible` = sum of max_score values
 - `qual_pct` = total_score / max_possible as a percentage
-- `weak_dimensions` = dimensions where score is 0 or significantly below max_score (less than 50% of max)
+- `weak_dimensions` = dimensions where score is 0 or significantly below max_score (less than 50% of max). For weak dimensions, save the `result` text (the agent's finding) to use in coaching recommendations.
 - `strong_dimensions` = dimensions where score is at or near max
 
 Join on the entry `title`, not the key. Discover the actual dimension titles from the first response rather than hardcoding.
+
+**If you have more than 15 open deals:** Write scores to a CSV on disk as you go (`/home/claude/qual_scores.csv`) rather than holding everything in the conversation. Columns: deal_key, company, dimension, score, max_score, result_summary. Read from the file when building the output.
 
 **Step 6A-2: Find the Deal Readiness Scorecard agent**
 
@@ -170,10 +185,12 @@ The Deal Readiness Scorecard measures late-stage close mechanics across six scor
 | Budget Confirmed | Is funding verified, allocated, or approved? |
 | Recommendation | (Unscored, max_score=0) Synthesized coaching recommendation across all dimensions |
 
-**How to pull scores:** For each open deal, run the scorecard against the most recent meeting in that deal:
+**How to pull scores:** For **every** open deal that has at least one meeting with a transcript, run the scorecard against the most recent meeting:
 ```
 agent_results(meeting_id=most_recent_meeting_id, template_id=deal_readiness_template_id)
 ```
+
+**Same 100% coverage rule applies.** Score every deal. Use the same extract-and-discard strategy: pull the response, extract title/score/max_score/result for each dimension, save the Recommendation text, discard the raw response, move to the next deal. Write to disk if context is tight.
 
 Note: Unlike MEDDPICC/BANT (which have deal-level qualification via get_qualification_results), the Deal Readiness Scorecard runs per-meeting via agent_results. Use the most recent external meeting per deal for the most current read.
 
@@ -251,7 +268,17 @@ When both layers exist:
 
 When only one layer exists, use it alongside momentum and deal size for prioritization.
 
-**Scale note:** agent_results is one call per meeting per agent. For per-meeting agents (DRS and non-qualification agents), run only on the most recent meeting per deal, so the call count equals the number of open deals per agent. Warn if total agent_results calls would exceed 50.
+**Scale note:** agent_results is one call per meeting per agent. For per-meeting agents (DRS and non-qualification agents), run only on the most recent meeting per deal, so the call count equals the number of open deals per agent.
+
+**NON-NEGOTIABLE: Score 100% of deals.**
+The skill MUST score every open deal with every available agent before producing output. "Running out of context" or "this is taking a while" is not a valid reason to skip deals. Use these strategies to manage context:
+1. Extract scores immediately, discard raw responses. You need title + score + max_score per dimension, plus the result text for weak dimensions only. That is ~50 tokens per deal per agent, not thousands.
+2. Write extracted scores to a file on disk (`/home/claude/scores.csv`) if you have more than 10 deals.
+3. Process deals sequentially: pull, extract, discard, next.
+4. If a single agent_results call returns an error or no data (no transcript), record "No transcript" for that deal and continue. Do not stop the loop.
+5. Tell the user the progress: "Scoring deal 5 of 15..." so they know work is happening.
+
+If there are 30+ open deals, warn the user that scoring will take several minutes and proceed. Do not ask permission to skip deals. Do not offer to "come back and score the rest later." Do the work.
 
 ### 7. Analyze meeting momentum
 
@@ -388,7 +415,21 @@ The output should be scannable, visual, and action-oriented. Use bullets and tab
 - **Bold the action.** In each bullet, bold the verb or the thing that needs to happen: "**Send** security one-pager to Ken", "**Ask:** 'Who manages vendor onboarding?'"
 - **One line per insight.** If a point takes more than 2 lines, break it into sub-bullets.
 
-Build the output as a markdown file with the following sections:
+**Output format: Word document (.docx)**
+
+Read the docx skill (`/mnt/skills/public/docx/SKILL.md`) before generating the output. Use `npm install -g docx` and build the document in JavaScript with the `docx` library. This produces a .docx that opens cleanly in Google Drive, Word, and other editors (unlike markdown with embedded PNG references, which fails on Google Drive export).
+
+**Document design:**
+- Font: Arial throughout. Default body size 11pt.
+- Heading 1: 18pt bold, color #1B2A4A (navy). Heading 2: 14pt bold, color #1B2A4A. Heading 3: 12pt bold, color #2CB5AD (teal).
+- Tables: header row with navy background (#1B2A4A) and white text, light cell shading by tier (green-tint for T1, blue-tint for T2, amber-tint for T3, red-tint for T4). Always use DXA widths, never percentages. Set both `columnWidths` on the table and `width` on each cell.
+- Bullets: use `LevelFormat.BULLET` with numbering config. Never use unicode bullet characters.
+- Bold action verbs in every bullet using TextRun with `bold: true`.
+- Page breaks between major sections (after charts, before per-deal strategies, before closing playbook).
+- Charts: generate as PNGs with matplotlib at 300 DPI, then embed as `ImageRun` with `type: "png"`. Size to ~650px wide for full-width charts.
+- After building, validate with `python scripts/office/validate.py`.
+
+Build the .docx with the following sections:
 
 ---
 
@@ -413,19 +454,36 @@ Below the table, add a 2-3 bullet reality check: what the coverage ratio actuall
 
 ---
 
-**Charts (generate with code execution):**
+**Charts (generate with code execution, embed in docx):**
 
-Generate the following charts using matplotlib and save as images embedded in the output (or as separate files presented alongside the markdown):
+Generate the following charts using matplotlib, save as PNGs, then embed them in the .docx via `ImageRun`. Do NOT save charts as separate output files; the whole point of .docx is that the charts live inside the document.
 
-1. **Pipeline by Tier (horizontal stacked bar):** Single bar showing Tier 1 / Tier 2 / Tier 3 / Tier 4 amounts stacked, with a vertical line at the quota target. Shows at a glance how much pipeline sits in each tier relative to the number.
+**Chart generation process:**
+1. Generate each chart with matplotlib and save as PNG at 300 DPI to `/home/claude/` (working directory, not outputs).
+2. In the docx build script, `fs.readFileSync` each PNG and embed as `new ImageRun({ data: buffer, transformation: { width: 650, height: N }, type: "png" })`.
+3. Charts go in their own section after the Executive Summary, before the Pipeline Overview Table.
 
-2. **Scenario Waterfall:** Stacked bar or waterfall chart showing the cumulative path: Tier 1 total, + DHL pull-in, + next best deal, etc. with a horizontal line at quota. Makes the "what do I need to close" question visual.
+**Color palette (use consistently across all charts):**
+- Tier 1 / Must Win / High / Score 3: `#2E7D32` (strong green)
+- Tier 2 / Should Win / Medium / Score 2: `#1565C0` (strong blue)
+- Tier 3 / Could Win / Low / Score 1: `#F9A825` (amber/warning)
+- Tier 4 / Long Shot / Score 0: `#C62828` (red)
+- Quota line: `#212121` (black, dashed)
+- Background: white, no gridlines
 
-3. **Deal Momentum Timeline (optional, if 5+ deals):** Scatter or timeline showing each deal's meetings plotted over time (x-axis = date, y-axis = deal name, dots = meetings). Instantly shows which deals have regular cadence vs. gaps. Color-code by tier.
+**Chart styling rules:**
+- Title in bold, 14pt. Axis labels 11pt.
+- Label data directly on bars/cells (not in a separate legend) when possible.
+- Use commas in dollar amounts ($51,000 not $51000).
+- Save each chart as a separate PNG at 300 DPI to `/home/claude/` (working directory). They will be embedded in the docx, not presented separately.
 
-4. **Close Readiness Heatmap (if DRS or close-readiness agent exists):** Grid chart with deals as rows and DRS categories as columns. Color-coded cells: green (3), yellow (2), orange (1), red (0). This replaces the text-based heatmap table.
+1. **Pipeline by Tier (horizontal stacked bar):** Single horizontal bar showing Tier 1 (green) / Tier 2 (blue) / Tier 3 (amber) / Tier 4 (red) amounts stacked left to right, with a vertical dashed black line at the quota target. Label each segment with the dollar amount and tier name. Shows at a glance how much pipeline sits in each tier relative to the number. Add a second thin bar below showing "In-Quarter Only" (deals with close dates before EOQ) to highlight the real coverage gap.
 
-Use clean, minimal chart styling. No gridlines. Label directly on the chart, not in a legend when possible. Save charts to /mnt/user-data/outputs/ and embed in the markdown with image references.
+2. **Scenario Waterfall:** Horizontal waterfall chart showing the cumulative path to quota. Start with Tier 1 total (green), then add the best pull-in deals one at a time (blue), with a horizontal dashed black line at quota. Label each bar with the deal name and amount. The bar that crosses the quota line should be visually highlighted. Makes the "what combination do I need" question instantly clear.
+
+3. **Deal Momentum Timeline (optional, if 5+ deals):** Scatter plot with x-axis = date (quarter window), y-axis = deal name. Each dot is a meeting, color-coded by tier (green/blue/amber/red). Dot size slightly larger for external meetings. Instantly shows cadence, gaps, and recency. Add a vertical "today" line in black.
+
+4. **Close Readiness Heatmap (if DRS or close-readiness agent exists):** Grid chart with deals as rows and DRS categories as columns. Color-coded cells: green (3), yellow-green (2), amber (1), red (0). White cells for "Not scored." Add the numeric score inside each cell. Sort rows by total DRS score descending. This replaces the text-based heatmap table and is the single most important chart in the output.
 
 ---
 
@@ -488,7 +546,7 @@ No flowing prose anywhere in the per-deal section. Every insight is a bullet. Ev
 ---
 
 **Close Readiness Heatmap:**
-If a chart was generated in the charts step, reference it here. If not (no code execution), fall back to the symbol-coded table:
+If the heatmap chart was generated, embed it here via ImageRun. If not (no code execution), fall back to a formatted Table:
 | Deal | Tech Win | Legal Access | Legal Win | Procurement | CTA Quarter | Budget |
 Use: checkmark (3), arrow (2), warning (1), X (0).
 
@@ -519,12 +577,13 @@ After the heatmap, add a **Portfolio-Level Gaps** section (bulleted):
 
 ---
 
-Save as a markdown file: `Path_to_Quota_{eoq_date}.md`
-If charts were generated, also save them as separate image files.
-Present all files to the user.
+Save as a Word document: `Path_to_Quota_{eoq_date}.docx` in `/mnt/user-data/outputs/`.
+Validate with `python /mnt/skills/public/docx/scripts/office/validate.py <file>` before presenting.
+Present the single .docx file to the user. Charts are embedded inside the document, not saved separately.
 
 ## Rules (from the Aircover MCP playbook)
 
+- **100% DEAL COVERAGE IS MANDATORY.** Every open deal must be scored by every available agent. Do not skip deals due to context length, large responses, or time. Extract scores (title + score + max_score), discard raw responses, write to disk if needed, and continue. "Not scored" in the output is acceptable ONLY when the deal has no transcript or the agent returned an error, never because you ran out of room or made a judgment call to stop early. This is the #1 quality bar for this skill.
 - **Join agent_results on title, not key.** Discover field names at runtime. Never fabricate; use placeholders instead. This applies to all agents: qualification (MEDDPICC, BANT, or other) via get_qualification_results, and per-meeting agents (Deal Readiness Scorecard or other) via agent_results.
 - **Full 32-char meeting ids** everywhere, especially in URLs. Build meeting links as `https://app.aircover.ai/meetings/{full_id}`.
 - **Filter by prospect_org or deal_key**, never bare deal_id. Use `prospect_org/deal_id` as the composite key.
@@ -537,7 +596,7 @@ Present all files to the user.
 - **Custom rubric caveat.** When using Path C (custom scoring), always note in the output that scores are Claude's interpretation from meeting notes, not from a trained Aircover agent.
 - **Distinguish "no data" from "retry."** A get_deals cache-miss error means retry once, not that the deal is empty.
 - **Handle "no transcript" gracefully.** If a meeting has no transcript, still include it in the meeting count and momentum analysis, but skip both the next-steps extraction and any per-meeting agent runs for that meeting (agent_results needs a transcript).
-- **Scale awareness.** This skill typically processes 10-50 deals. If list_meetings returns 200+ meetings, warn the user and suggest narrowing the date range or filtering by team. For get_qualification_results, run one call per deal. For agent_results (per-meeting agents), run one call per deal on the most recent meeting only. Total agent_results calls = number of open deals x number of per-meeting agents selected.
+- **Scale awareness.** This skill typically processes 10-50 deals. If list_meetings returns 200+ meetings, warn the user it will take a few minutes and proceed (do not ask to narrow). For get_qualification_results, run one call per deal. For agent_results (per-meeting agents), run one call per deal on the most recent meeting only. Total agent_results calls = number of open deals x number of per-meeting agents selected. For 15 deals x 2 agents = 30 calls, which is fine. For 50+ deals, warn about time and proceed.
 - **Owner scoping is mandatory.** Always pass the user's email to list_meetings. Pulling the whole org's meetings and trying to filter client-side is wasteful and may exceed context.
 - **Discover field names at runtime.** Inspect the first get_deal, get_qualification_results, and agent_results responses to confirm the actual CRM field names and agent dimension titles before building the output. Do not hardcode field names.
 - **All scoring agents are optional.** The skill works with any combination: both agents, one agent, custom rubric, or none. When no scoring exists, prioritization uses CRM data (deal amount, stage, close date) and meeting momentum only.
