@@ -1,5 +1,4 @@
-<img width="200" height="29" alt="image 7" src="https://github.com/user-attachments/assets/01b74786-d620-4ebc-a2aa-e2460241688f" />
-
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/0c36bfa6-bfb4-435e-ac2c-d2cba4667083" />
 
 # Aircover Skills
 
