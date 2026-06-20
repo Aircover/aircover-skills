@@ -1,3 +1,5 @@
+<img width="1032" height="140" alt="image" src="https://github.com/user-attachments/assets/791a5569-94a4-4612-8418-3be7aaf37e4c" />
+
 # Aircover Skills
 
 Turn your Aircover calls into finished work in seconds. Each skill is a ready-made tool you add to Claude once, then use by just asking in plain English. No setup, no coding, no GitHub knowledge needed.
