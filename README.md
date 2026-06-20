@@ -60,7 +60,8 @@ An end-of-quarter game plan built from your meetings and pipeline. It scores eve
 **You get:** a Word doc with a prioritized deal list, per-deal close strategies, and charts.
 **[Download Path to Quota](https://github.com/Aircover/aircover-skills/releases/download/path-to-quota-v1.0.0/path-to-quota.skill)**
 
-<img width="684" height="820" alt="image (12)" src="https://github.com/user-attachments/assets/2ed8069a-07c4-4719-a1d3-670194ed6e2f" />
+<img width="584" height="682" alt="image" src="https://github.com/user-attachments/assets/bb438b11-8f42-4397-bb35-459dde079a25" />
+
 
 
 ## Good to know
