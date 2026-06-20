@@ -11,7 +11,7 @@ Turn your Aircover calls into finished work in seconds. Each skill is a ready-ma
 
 The skills read your live Aircover data, so Claude needs to be connected to your
 Aircover account before they'll work.
-1. In Claude, open **[Connectors](https://claude.ai/settings/connectors)** (Settings > Connectors).
+1. In Claude, open **[Connectors](https://claude.ai/customize/connectors)** (Settings > Connectors).
 2. Find **Aircover** and click **Connect**.
 3. Log in with your Aircover credentials and approve access.
 
