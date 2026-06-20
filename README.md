@@ -7,6 +7,17 @@ Turn your Aircover calls into finished work in seconds. Each skill is a ready-ma
 
 **Pick a skill below, click Download, add it to Claude, and ask.** You get a polished, ready-to-share document back.
 
+## First, connect Aircover (one time)
+
+The skills read your live Aircover data, so Claude needs to be connected to your
+Aircover account before they'll work.
+1. In Claude, open **[Connectors](https://claude.ai/settings/connectors)** (Settings > Connectors).
+2. Find **Aircover** and click **Connect**.
+3. Log in with your Aircover credentials and approve access.
+
+If your admin already enabled Aircover for your whole team, you may just be asked to
+log in the first time you run a skill.
+
 ## How to add a skill (about 2 minutes, one time)
 
 1. Click the **Download** link for the skill you want (below). A `.skill` file saves to your computer.
