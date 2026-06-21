@@ -7,6 +7,11 @@ An end-of-quarter game plan from your meetings and pipeline. It scores and ranks
 
 <img width="584" height="682" alt="image" src="https://github.com/user-attachments/assets/bb438b11-8f42-4397-bb35-459dde079a25" />
 
+- "What's my path to quota this quarter?"
+- "Build a mutual action plan for Acme."
+- "Prep me for my next call with Acme."
+- "Give me a product sentiment report for the last 30 days."
+
 ## The skills
 
 ### Mutual Action Plan
