@@ -18,7 +18,7 @@ The skills read your live Aircover data, so connect Claude to Aircover first.
 ## Add a skill (about 2 minutes, one time)
 
 1. Click a skill's **Download** link below. A `.skill` file saves to your computer.
-2. In Claude, go to **Customize > Skills** (or **Organization settings > Skills** for your team).
+2. In Claude, go to **Customize > [Skills](https://claude.ai/customize/skills)** (or **Organization settings > Skills** for your team).
 3. Click **Add skill** and choose the file.
 
 That's it. Then just ask, for example:
