@@ -2,24 +2,25 @@
 
 # Aircover Skills
 
-Turn your Aircover calls into finished work in seconds. These skills are purpose-built for Aircover, drawing on your transcripts, AI agent analysis, calendar, and Salesforce data to streamline key seller workflows. Add one to Claude once, then just ask in plain English. No setup, no coding, no GitHub needed.
+Turn your Aircover calls into finished work in seconds. These skills are purpose-built for Aircover, drawing on your transcripts, AI agent analysis, calendar, and Salesforce data to streamline key seller workflows. They work in Claude, ChatGPT, and Gemini. Add one once, then just ask in plain English. No setup, no coding, no GitHub needed.
 
-**Pick a skill, download it, add it to Claude, and ask.** You get a polished, ready-to-share doc back.
+**Pick a skill, download it, add it to your AI assistant, and ask.** You get a polished, ready-to-share doc back.
 
 ## First, connect Aircover (one time)
 
-The skills read your live Aircover data, so connect Claude to Aircover first.
-1. In Claude, open **[Connectors](https://claude.ai/customize/connectors)** (Settings > Connectors).
-2. Find **Aircover** and click **Connect**.
-3. Log in and approve access.
+The skills read your live Aircover data, so connect your assistant to Aircover first. Open its connector settings, add Aircover, then log in and approve access.
+- **Claude:** **[Connectors](https://claude.ai/customize/connectors)** (Settings > Connectors). Find **Aircover** and click **Connect**.
+- **ChatGPT:** Settings > **Apps & Connectors**. Turn on **Developer mode** under Advanced, then create a connector with your Aircover MCP URL.
+- **Gemini:** Settings > **Connected apps** > **Add a custom app**, then paste your Aircover MCP URL.
 
-**Don't see Aircover in the list?** Set it up in under 5 minutes at [Aircover MCP settings](https://app.aircover.ai/integrations/mcp-settings). No admin rights? Send that link to your Aircover admin.
+**Don't see Aircover, or need your MCP URL?** Set it up in under 5 minutes at [Aircover MCP settings](https://app.aircover.ai/integrations/mcp-settings). No admin rights? Send that link to your Aircover admin.
 
 ## Add a skill (about 2 minutes, one time)
 
-1. Click a skill's **Download** link below. A `.skill` file saves to your computer.
-2. In Claude, go to **Customize > [Skills](https://claude.ai/customize/skills)** (or **Organization settings > Skills** for your team).
-3. Click **Add skill** and choose the file.
+Click a skill's **Download** link below (a `.skill` file saves to your computer), then upload it:
+- **Claude:** **Customize > [Skills](https://claude.ai/customize/skills)** (or **Organization settings > Skills** for your team) > **Add skill**.
+- **ChatGPT:** **Plugins** in the sidebar > **Skills** tab > upload the file.
+- **Gemini:** Settings > **Skills** > **Upload**.
 
 That's it. Then just ask, for example:
 - "What's my path to quota this quarter?"
