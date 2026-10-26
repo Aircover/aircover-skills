@@ -60,6 +60,10 @@ opportunity is the failure this skill exists to prevent.
 Written last, after every other section exists. The summary asserts nothing the body does not
 carry. Cap it at one page.
 
+`snapshot_metrics` render as tiles on the At a glance page, not in this section. Each value is
+a number, an amount or a date, 12 characters or fewer ("3", "$441,000", "12 days ago"). A
+qualifier such as "1 with CRM data" belongs in relationship health, where it can be explained.
+
 ## 3. Plan section 2, Customer landscape and market insights
 
 The highest fabrication risk in the document. The uploaded outline ships example challenges

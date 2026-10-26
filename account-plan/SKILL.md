@@ -319,6 +319,13 @@ rules most often missed:
   Only the first is derivable from tools; the rest are labelled recommendations. Record each in
   `strategic_narrative.dimensions`.
 - **Write the executive summary last**, asserting nothing that is not in the body.
+- **Page 1 is built for you, so feed it well.** The Word file opens with an "At a glance" page
+  read straight from the values: the snapshot tiles, the first two sentences of
+  `gtm.priority` (where to spend first), the opportunities with an amount or close date, the
+  first four `stakeholders.known`, and the first three `next_steps_map.steps`. So: keep each
+  `snapshot_metrics` value to a number or date (12 characters or fewer, the caveat goes in the
+  body), make the first two sentences of `gtm.priority` the whole recommendation, list the most
+  important people and steps first, and keep `meta.account_owner` to a name.
 
 Then run the consistency pass (`output_standard.md` §9) and both checks:
 

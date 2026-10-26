@@ -1,6 +1,6 @@
 # Close Plan (Aircover skill)
 
-Turn a live Aircover deal into the team's standard close plan workbook: Deal Overview, a scored Health Score across five buckets, an Action Plan with one recommended action per gap, and a Stakeholder Map heat map. Every marker traces to a call or the CRM; anything the data cannot supply reads Needs Input instead of a guess.
+Turn a live Aircover deal into the team's standard close plan workbook: a one-page Summary, a scored Health Score across five buckets, an Action Plan with one recommended action per gap, and a Stakeholder Map heat map. Every marker traces to a call or the CRM; anything the data cannot supply reads Needs Input instead of a guess.
 
 This is an internal seller-facing artifact. It runs as a skill inside an assistant connected to the Aircover MCP server.
 

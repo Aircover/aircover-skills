@@ -5,7 +5,7 @@ workbook may be written without a source named here.
 
 ## Contents
 1. Header block
-2. Deal Overview, the four questions
+2. Summary, the four deal story questions
 3. Health Score, 26 items in five buckets
 3b. The coverage note
 4. Action Plan
@@ -17,20 +17,21 @@ workbook may be written without a source named here.
 
 ## 1. Header block
 
-Deal Overview rows 1 to 4. Unchanged from V2.
+The header facts at the top of the Summary tab. Cells are `config.header_cells`; the labels
+below are what the tab shows.
 
 | Cell | Field | Source |
 |---|---|---|
-| B1 | Customer | `get_deal` company name or `prospect_org` |
-| D1 | AE | `get_deal.customer_owner`, the deal's recorded owner. Falls back to meeting organizer or most frequent `vendor.email_domain` speaker only when that field is empty. Mark sourced when it came from `customer_owner`, inferred when it came from attendance |
-| B2 | Opp Link | `build_opp_link` using `config.crm` (source, fields, instance, url template). With `instance` null there is no hostname to build a URL from, so write the plain reference `"<CRM> - Opportunity <id>"` instead. Never blank when an opp id exists, and never guess a hostname |
-| D2 | SE | Prompted. Prefill: second most frequent `vendor.email_domain` speaker, excluding the AE. Always inferred, never sourced |
-| B3 | Close Date | `config.crm.<source>.fields.close_date`, written as a real date |
-| D3 | Partner | Prompted. No transcript contains this |
-| B4 | Net Incremental ARR | `config.crm.<source>.fields.amount` as option A, free text as option B. The engine applies `config.formats.arr`, so it renders as money rather than as a bare quantity |
-| D4 | Deal in Forecast | `config.crm.<source>.fields.stage` |
+| B3 | Customer (title) | `get_deal` company name or `prospect_org` |
+| I6 | AE | `get_deal.customer_owner`, the deal's recorded owner. Falls back to meeting organizer or most frequent `vendor.email_domain` speaker only when that field is empty. Mark sourced when it came from `customer_owner`, inferred when it came from attendance |
+| G7 | CRM | `build_opp_link` using `config.crm` (source, fields, instance, url template). With `instance` null there is no hostname to build a URL from, so write the plain reference `"<CRM> - Opportunity <id>"` instead. Never blank when an opp id exists, and never guess a hostname |
+| C7 | SE | Prompted. Prefill: second most frequent `vendor.email_domain` speaker, excluding the AE. Always inferred, never sourced |
+| E6 | Close date | `config.crm.<source>.fields.close_date`, written as a real date |
+| E7 | Partner | Prompted. No transcript contains this |
+| C6 | Amount | `config.crm.<source>.fields.amount` as option A, free text as option B. The engine applies `config.formats.arr`, so it renders as money rather than as a bare quantity |
+| G6 | Stage | `config.crm.<source>.fields.stage` |
 
-## 2. Deal Overview, the four questions
+## 2. Summary, the four deal story questions
 
 Four questions and nothing else. The champion, economic buyer, technical win, exec engagement
 and vendor sponsor blocks that used to sit below these are gone: they are now Health Score
@@ -39,18 +40,18 @@ that drifted apart.
 
 | Answer cell | Question | Source |
 |---|---|---|
-| A8 | Primary business units using the product | Close Plan: Usage Footprint, the team and business unit lines |
-| A10 | How they are using it **today** | Close Plan: Usage Footprint use case lines |
-| A12 | **Primary use case vs secondary use case**, and the problem being solved | Close Plan Usage Footprint, ranked, plus MEDDPICC Identify Pain for the problem |
-| A14 | The product's impact on the customer's business, with specific metrics | MEDDPICC Metrics and Identify Pain together. Frequently thin; working sessions rarely quantify ROI |
+| B40 | Primary business units using the product | Close Plan: Usage Footprint, the team and business unit lines |
+| B42 | How they are using it **today** | Close Plan: Usage Footprint use case lines |
+| B44 | **Primary use case vs secondary use case**, and the problem being solved | Close Plan Usage Footprint, ranked, plus MEDDPICC Identify Pain for the problem |
+| B46 | The product's impact on the customer's business, with specific metrics | MEDDPICC Metrics and Identify Pain together. Frequently thin; working sessions rarely quantify ROI |
 
-**A12 must separate primary from secondary.** This is not cosmetic. Which use case leads tells
+**B44 must separate primary from secondary.** This is not cosmetic. Which use case leads tells
 the AE who to lean on: a governance-first deployment points at the CISO and VP IT, an
 engineering-efficiency-first one points at platform and dev leadership. A blended answer that
 names four use cases with no ranking gives the AE nothing to act on. Name the primary, name the
 secondary, then state the problem being solved.
 
-**A14 absorbed two V2 questions.** The old sheet asked separately what the problem costs the
+**B46 absorbed two V2 questions.** The old sheet asked separately what the problem costs the
 customer today and what the value proposition and ROI are. Both now land here, which means this
 one answer carries the whole commercial case: what the problem costs them, what the product is
 worth, and the metrics behind it. Do not reintroduce the split.
@@ -138,7 +139,7 @@ rows above them. Their content now lands as follows:
 | Old element | Now lives in |
 |---|---|
 | Single threaded | Stakeholder Map: a thin committee is visible in the grid |
-| No business case tied to a metric | Row 27 and Deal Overview A14 |
+| No business case tied to a metric | Row 27 and Summary deal story (vendor impact) |
 | Verbal yes but no dates on paper | Rows 35 and 36 |
 | Legal or security review not started near close | Row 17, and the Action Plan row it generates |
 | Risk boxes: PRICING, COMPETITIVE, TECHNICAL, EXEC ALIGNMENT, LEGAL SECURITY, SIGNATURE | Action Plan `action` and `comments` on the matching bucket's items |

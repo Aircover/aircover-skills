@@ -1,5 +1,5 @@
 {
-  "_comment": "Everything customer-specific lives here. The engine (fill_close_plan.py) reads this and stays template-agnostic; build_template.py reads the same file, so the template asset and this config cannot drift on the stakeholder axes. Nothing about any particular vendor or CRM is baked into the code, the prose, or the template labels. Set `vendor` and `crm` and the workbook retitles itself. V3.1 layout: four tabs (Deal Overview, Health Score, Action Plan, Stakeholder Map).",
+  "_comment": "Everything customer-specific lives here. The engine (fill_close_plan.py) reads this and stays template-agnostic; build_template.py reads the same file, so the template asset and this config cannot drift on the stakeholder axes. Nothing about any particular vendor or CRM is baked into the code, the prose, or the template labels. Set `vendor` and `crm` and the workbook retitles itself. V5 layout: four tabs (Summary, Health Score, Action Plan, Stakeholder Map), styled in the Aircover palette.",
   "environment": {
     "name": "Production",
     "api_host": "api.aircover.ai",
@@ -38,27 +38,33 @@
   },
   "template": {
     "file": "Close_Plan_TEMPLATE.xlsx",
-    "overview_sheet": "Deal Overview",
+    "overview_sheet": "Summary",
     "health_sheet": "Health Score",
     "actions_sheet": "Action Plan",
     "stakeholder_sheet": "Stakeholder Map"
   },
   "header_cells": {
-    "customer": "B1",
-    "ae": "D1",
-    "opp_link": "B2",
-    "se": "D2",
-    "close_date": "B3",
-    "partner": "D3",
-    "arr": "B4",
-    "forecast": "D4"
+    "customer": "B3",
+    "arr": "C6",
+    "close_date": "E6",
+    "forecast": "G6",
+    "ae": "I6",
+    "se": "C7",
+    "partner": "E7",
+    "opp_link": "G7"
   },
   "synopsis_cells": {
-    "_comment": "Four questions, nothing else. Usage is split: how they use it today, then the primary-vs-secondary ranking. The problem-impact and value/ROI questions are collapsed into the single vendor_impact question.",
-    "business_units": "A8",
-    "how_using": "A10",
-    "use_cases": "A12",
-    "vendor_impact": "A14"
+    "_comment": "Four questions, nothing else. Usage is split: how they use it today, then the primary-vs-secondary ranking. The problem-impact and value/ROI questions are collapsed into the single vendor_impact question. They sit in the Summary tab's Deal Story block; build_template.summary_layout owns the rows and refuses to build if these disagree.",
+    "business_units": "B40",
+    "how_using": "B42",
+    "use_cases": "B44",
+    "vendor_impact": "B46"
+  },
+  "summary": {
+    "_comment": "The Summary tab: one page that answers 'where is this deal'. The overall score, bucket bars, next actions and key people are formulas into the other tabs, so they follow the AE's edits. risk_count and action_count set how many rows each block gets; changing either moves every block below it, so regenerate the template with build_template.py and update header_cells, synopsis_cells and label_overrides to what it reports. Top risks are written from values.json `summary.risks`; next actions from `summary.next_actions` (Health Score item keys, in priority order).",
+    "risk_count": 3,
+    "action_count": 5,
+    "bar_length": 36
   },
   "health": {
     "_comment": "Five fixed buckets. Each item is worth an equal share of its bucket: Yes 100%, In Progress 50%, No and Needs Input 0%. Written as a live formula so the AE's own overrides recompute. Needs Input scores zero on purpose, so missing evidence cannot raise the score. Overall = average of the five, weighted equally. Anything not Yes still generates an Action Plan row.",
@@ -141,27 +147,27 @@
     "_comment": "Four states. `unknown` renders as the literal words Needs Input rather than a blank, because a blank marker cell reads as 'nobody has looked' and, more importantly, an empty answer must still count against the bucket denominator. These colours are applied as CONDITIONAL FORMATTING rules keyed on the marker text, not as a fill painted once at build time, so the colour follows the AE's dropdown choice instead of freezing at whatever the agents scored.",
     "yes": {
       "text": "Yes",
-      "font": "FF1E1E1E",
-      "fill": "FFC6EFCE"
+      "font": "FF1E7B55",
+      "fill": "FFE3F5EC"
     },
     "partial": {
       "text": "In Progress",
-      "font": "FF1E1E1E",
-      "fill": "FFFFEB9C"
+      "font": "FF8A6100",
+      "fill": "FFFDF3D8"
     },
     "no": {
       "text": "No",
-      "font": "FF1E1E1E",
-      "fill": "FFFFC7CE"
+      "font": "FFB23B3B",
+      "fill": "FFFBE4E4"
     },
     "unknown": {
       "text": "Needs Input",
-      "font": "FF666666",
-      "fill": "FFF2F2F2"
+      "font": "FF7A8CA0",
+      "fill": "FFF2F4F7"
     }
   },
   "actions": {
-    "_comment": "Rows are generated, not mapped: one per Health Score item whose marker is not `yes`, in bucket order then sheet order. `bucket_tints` colour column A so the reader can see at a glance which gap belongs to which bucket.",
+    "_comment": "Rows are generated, not mapped: one per Health Score item whose marker is not `yes`, in bucket order then sheet order. Column A names the bucket in navy; `bucket_tints` can add a fill per bucket but ships empty for a calmer sheet.",
     "first_row": 4,
     "columns": {
       "bucket": "A",
@@ -171,7 +177,7 @@
       "status": "E",
       "comments": "F"
     },
-    "row_height": 43.5,
+    "row_height": 30,
     "bucket_titles": {
       "stakeholder_alignment": "Stakeholder Alignment",
       "technical_validation": "Technical Validation",
@@ -179,13 +185,7 @@
       "competition": "Competition",
       "timeline_risk": "Timeline & Risk"
     },
-    "bucket_tints": {
-      "stakeholder_alignment": "FFFDE9DD",
-      "technical_validation": "FFE8F0FE",
-      "commercial": "FFE6F4EA",
-      "competition": "FFFCE8E6",
-      "timeline_risk": "FFF3E8FD"
-    },
+    "bucket_tints": {},
     "status_dropdown": {
       "enabled": true,
       "options": [
@@ -197,20 +197,20 @@
       "default": "Not started",
       "colors": {
         "Not started": {
-          "fill": "FFF2F2F2",
-          "font": "FF666666"
+          "fill": "FFF2F4F7",
+          "font": "FF7A8CA0"
         },
         "In progress": {
-          "fill": "FFFFEB9C",
-          "font": "FF1E1E1E"
+          "fill": "FFFDF3D8",
+          "font": "FF8A6100"
         },
         "Blocked": {
-          "fill": "FFFFC7CE",
-          "font": "FF1E1E1E"
+          "fill": "FFFBE4E4",
+          "font": "FFB23B3B"
         },
         "Done": {
-          "fill": "FFC6EFCE",
-          "font": "FF1E1E1E"
+          "fill": "FFE3F5EC",
+          "font": "FF1E7B55"
         }
       }
     }
@@ -263,23 +263,23 @@
       "_comment": "Red / amber / green by engagement level, plus a neutral fill for grid cells where no persona is expected. `gap` is the '?' bubble: a persona the deal should have and does not.",
       "engaged": {
         "text": "Engaged",
-        "fill": "FFC6EFCE",
-        "font": "FF1E1E1E"
+        "fill": "FFE3F5EC",
+        "font": "FF1E7B55"
       },
       "emerging": {
         "text": "Emerging",
-        "fill": "FFFFEB9C",
-        "font": "FF1E1E1E"
+        "fill": "FFFDF3D8",
+        "font": "FF8A6100"
       },
       "gap": {
         "text": "Not yet mapped",
-        "fill": "FFFFC7CE",
-        "font": "FF1E1E1E"
+        "fill": "FFFBE4E4",
+        "font": "FFB23B3B"
       },
       "none": {
         "text": "",
-        "fill": "FFF2F2F2",
-        "font": "FF666666"
+        "fill": "FFF7F9FB",
+        "font": "FF7A8CA0"
       }
     },
     "gap_placeholder": "?",
@@ -287,8 +287,8 @@
     "_unplaced_comment": "Row under the heat map for attendees who cannot be placed on it. Since the grid carries a 'Seniority not stated' row, this line is now ONLY for people whose FUNCTION is unevidenced too: a person who joined one call and whose team, remit, or title appears nowhere. Guessing a function is fabrication, but so is dropping them, because the grid then under-reports who has been in the room. Name them here with their meeting dates and the reason."
   },
   "value_colors": {
-    "sourced": "FF1F2937",
-    "placeholder": "FF6B7280"
+    "sourced": "FF1B2A4A",
+    "placeholder": "FF7A8CA0"
   },
   "vendor": {
     "_comment": "The selling org, i.e. whoever is running this close plan. Substituted into template labels via {vendor} and used to infer AE and SE from meeting attendance. EMPTY BY DESIGN: set it on first run. With name blank the template labels render without a company name, which is correct until someone sets it.",
@@ -337,10 +337,10 @@
     "_comment": "Applied to the overview sheet before values are written. {vendor} is substituted from vendor.name, so the shipped template carries no company name. With vendor.name blank the template's own neutral wording is left alone.",
     "sheet": "overview",
     "cells": {
-      "A7": "Who are the primary business units using {vendor}?",
-      "A9": "How are they using {vendor} today?",
-      "A11": "What is the primary use case vs. what is the secondary use case? (use case = what problem are we solving)",
-      "A13": "What is {vendor}'s impact to the customer's business? (cite specific metrics)"
+      "B39": "Who are the primary business units using {vendor}?",
+      "B41": "How are they using {vendor} today?",
+      "B43": "What is the primary use case vs. what is the secondary use case? (use case = what problem are we solving)",
+      "B45": "What is {vendor}'s impact to the customer's business? (cite specific metrics)"
     }
   },
   "formats": {

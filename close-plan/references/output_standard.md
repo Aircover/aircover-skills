@@ -12,7 +12,7 @@ it, and what done looks like" passes.
 2. Word budgets
 3. Banned language
 4. Owners and dates
-5. Deal Overview standard
+5. Summary deal story standard
 6. Stakeholder Map standard
 6b. The coverage note
 7. Blank versus "None identified"
@@ -63,10 +63,12 @@ the gap rather than an action.
 | Cell | Target | Note |
 |---|---|---|
 | Coverage note | 40 to 80 words | Meetings and window, where coverage stops, what that leaves unobserved |
-| A8 business units | 30 to 60 words | |
-| A10 how they use it today | 40 to 80 words | The deployment as it stands. The ranking belongs in A12, not here |
-| A12 primary vs secondary use case | 50 to 90 words | Name the primary, then the secondary, then the problem being solved. Do not run them together |
-| A14 product's impact | 50 to 100 words | The three-part shape in section 5. This question absorbed the old value-proposition and ROI questions, so it carries the whole commercial case |
+| B40 business units | 30 to 60 words | |
+| B42 how they use it today | 40 to 80 words | The deployment as it stands. The ranking belongs in B44, not here |
+| B44 primary vs secondary use case | 50 to 90 words | Name the primary, then the secondary, then the problem being solved. Do not run them together |
+| B46 product's impact | 50 to 100 words | The three-part shape in section 5. This question absorbed the old value-proposition and ROI questions, so it carries the whole commercial case |
+| Summary, each top risk | 12 to 25 words | One risk, its evidence (a date, a person, a missing step), no advice |
+| Action Plan, first sentence of column C | up to 15 words | It is all the Summary shows, so it must stand alone |
 | Action Plan, column C | 15 to 40 words | One action and its exit criterion. If it needs more, it is two rows |
 | Action Plan, column F | up to 40 words | Evidence only |
 | Stakeholder Map, notes | 15 to 35 words each | |
@@ -118,17 +120,17 @@ and make naming them the first clause of column C. Relative targets tied to a re
 acceptable in column C because they are recommendations, not recorded commitments: "before the
 pilot review", "ahead of the 10/30 close date".
 
-## 5. Deal Overview standard
+## 5. Summary deal story standard
 
 Four questions. Resist the pull to answer a fifth.
 
-**A12 leads with the ranking.** Write "Primary use case: X. Secondary use case: Y." as the
+**B44 leads with the ranking.** Write "Primary use case: X. Secondary use case: Y." as the
 first two sentences, then the problem being solved. An answer that lists four use cases in a
 paragraph has not answered the question, because the question exists to tell the AE which
 persona to lean on: governance-first points at the CISO and VP IT, engineering-efficiency-first
-points at platform leadership. A10 describes the deployment; A12 ranks it.
+points at platform leadership. B42 describes the deployment; B44 ranks it.
 
-**A14 is never blank.** A missing ROI figure does not make the question unanswerable. Write it
+**B46 is never blank.** A missing ROI figure does not make the question unanswerable. Write it
 in three parts:
 
 > Observed and expected value: [what the customer gets, in their words where available]
@@ -212,8 +214,8 @@ Rules for it:
 |---|---|
 | Health Score markers | "Needs Input". Never leave blank: a blank shrinks the bucket denominator and inflates the score |
 | Header free text (Partner, SE) | "None identified" or "Not assigned" |
-| Header CRM cell B2 | Full opportunity URL when an instance is configured, else "Salesforce - Opportunity {id}" or the HubSpot equivalent. Never blank when an opp id exists |
-| Deal Overview A8 to A14 | Never blank. Write what the calls do support and name what they do not |
+| Header CRM cell (Summary, CRM) | Full opportunity URL when an instance is configured, else "Salesforce - Opportunity {id}" or the HubSpot equivalent. Never blank when an opp id exists |
+| Summary deal story answers (B40 to B46) | Never blank. Write what the calls do support and name what they do not |
 | Action Plan, column C | Never blank. See section 1 |
 | Action Plan, columns D and F | "Not named" for owner; blank is acceptable for comments |
 | Stakeholder Map, names | "?" written by the engine. Leave it |
@@ -233,8 +235,8 @@ Run before writing the workbook. Five checks, all cheap:
    and adds or removes an Action Plan row.
 2. **Stakeholder Map against row 10.** Three "?" personas and `stakeholders_mapped` at `yes`
    is a contradiction. So is a fully populated map with row 10 at `no`.
-3. **Overview against the buckets.** A14 claiming a quantified business case while row 27 is
-   `no` is a contradiction. A12 ranking governance as the primary use case while the Stakeholder
+3. **Overview against the buckets.** B46 claiming a quantified business case while row 27 is
+   `no` is a contradiction. B44 ranking governance as the primary use case while the Stakeholder
    Map has no security persona is a gap worth a "?" bubble.
 4. **Banned language sweep.** Grep every written cell on all four tabs for the section 3
    strings.

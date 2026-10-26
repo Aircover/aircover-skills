@@ -15,6 +15,9 @@
  *     config marks the section never_blank, which raises a warning instead.
  *   - Renders INPUT NEEDED blocks in the configured placeholder style so the account team can
  *     see at a glance what still needs a human, rather than reading invented prose.
+ *   - Opens with a one-page "At a glance" summary (snapshot tiles, open opportunities, key
+ *     people, where to spend first, next steps) built from the same values, so nothing on it
+ *     can disagree with the sections behind it. config.document.at_a_glance: false turns it off.
  *   - Tags provenance: any block carrying `source` gets a small grey source line beneath it.
  *   - Colour codes stakeholder recency against config.scope.freshness_bands_days.
  *   - Runs the mechanical half of the consistency pass and prints warnings. --strict turns
@@ -50,10 +53,12 @@ const data = JSON.parse(fs.readFileSync(valuesFile, "utf-8"));
 
 const DOC = cfg.document || {};
 const C = Object.assign({
-  heading: "1F6F8B", body: "333333", muted: "666666", placeholder: "8A8A8A",
-  rule: "CCCCCC", table_header_fill: "F2F2F2",
-  current: "166534", aging: "854D0E", stale: "991B1B",
+  heading: "1B2A4A", accent: "2CB5AD", body: "3D4F6F", muted: "7A8CA0", placeholder: "7A8CA0",
+  rule: "E2E8F0", table_header_fill: "1B2A4A", table_header_text: "FFFFFF", band_fill: "F7F9FB",
+  tile_fill: "F7F9FB", title_fill: "1B2A4A", title_text: "FFFFFF", title_sub: "C8D0DA",
+  current: "1E7B55", aging: "8A6100", stale: "B23B3B",
 }, DOC.colors || {});
+const GLANCE = DOC.at_a_glance !== false;
 const FONT = (DOC.fonts && DOC.fonts.body) || "Calibri";
 const PLACEHOLDER = Object.assign({ label: "INPUT NEEDED", italic: false }, DOC.placeholder_style || {});
 const SHOW_SOURCE = DOC.show_provenance_labels !== false;
@@ -148,21 +153,36 @@ function bullet(text, opts = {}) {
 }
 
 function sectionHeading(number, title) {
+  const parts = [];
+  if (number) {
+    parts.push(new TextRun({ text: `${number}  `, font: HEADING_FONT, size: 28, bold: true, color: C.accent }));
+  }
+  parts.push(new TextRun({ text: sub(title), font: HEADING_FONT, size: 28, bold: true, color: C.heading }));
   return new Paragraph({
-    spacing: { before: 320, after: 140 },
-    border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: C.rule, space: 6 } },
+    spacing: { before: 360, after: 160 },
+    keepNext: true,
+    border: { bottom: { style: BorderStyle.SINGLE, size: 12, color: C.accent, space: 6 } },
     heading: HeadingLevel.HEADING_1,
-    children: [new TextRun({
-      text: sub(number ? `${number}. ${title}` : title), font: HEADING_FONT, size: 26, bold: true, color: C.heading,
-    })],
+    children: parts,
   });
 }
 
 function subHeading(title) {
   return new Paragraph({
-    spacing: { before: 200, after: 80 },
+    spacing: { before: 220, after: 80 },
+    keepNext: true,
     heading: HeadingLevel.HEADING_2,
-    children: [new TextRun({ text: sub(title), font: HEADING_FONT, size: 22, bold: true, color: C.body })],
+    children: [new TextRun({ text: sub(title), font: HEADING_FONT, size: 22, bold: true, color: C.heading })],
+  });
+}
+
+/** Small teal caps label, used to head the At a glance blocks. */
+function kicker(text, opts = {}) {
+  return new Paragraph({
+    spacing: { before: opts.before === undefined ? 240 : opts.before, after: 80 },
+    keepNext: true,
+    border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: C.rule, space: 4 } },
+    children: [new TextRun({ text: sub(text).toUpperCase(), font: FONT, size: 17, bold: true, color: C.accent })],
   });
 }
 
@@ -226,10 +246,17 @@ function cell(children, width, opts = {}) {
   return new TableCell({
     width: { size: width, type: WidthType.DXA },
     shading: opts.fill ? { type: ShadingType.CLEAR, fill: opts.fill, color: "auto" } : undefined,
-    margins: { top: 80, bottom: 80, left: 120, right: 120 },
+    margins: opts.margins || { top: 80, bottom: 80, left: 120, right: 120 },
+    borders: opts.borders,
+    verticalAlign: opts.valign,
     children,
   });
 }
+
+const NO_BORDER = { style: BorderStyle.NONE, size: 0, color: "FFFFFF" };
+const NO_BORDERS = { top: NO_BORDER, bottom: NO_BORDER, left: NO_BORDER, right: NO_BORDER,
+                     insideHorizontal: NO_BORDER, insideVertical: NO_BORDER };
+const hairline = () => ({ style: BorderStyle.SINGLE, size: 4, color: C.rule });
 
 /**
  * rows: array of arrays. Each entry is a string, or {text, color, bold}.
@@ -243,11 +270,11 @@ function table(headers, rows, widths) {
   const headerRow = new TableRow({
     tableHeader: true,
     children: headers.map((h, i) => cell(
-      [para(h, { bold: true, size: 18, after: 0, color: C.body })],
-      widths[i], { fill: C.table_header_fill },
+      [para(h, { bold: true, size: 18, after: 0, color: C.table_header_text })],
+      widths[i], { fill: C.table_header_fill, borders: { left: NO_BORDER, right: NO_BORDER } },
     )),
   });
-  const bodyRows = rows.map((r) => new TableRow({
+  const bodyRows = rows.map((r, ri) => new TableRow({
     children: r.map((v, i) => {
       const val = typeof v === "object" && v !== null ? v : { text: v };
       const content = lines(val.text).length
@@ -256,14 +283,65 @@ function table(headers, rows, widths) {
             color: val.color || C.body, bold: !!val.bold,
           }))
         : [para("", { size: 18, after: 0 })];
-      return cell(content, widths[i]);
+      return cell(content, widths[i], { fill: ri % 2 === 1 ? C.band_fill : undefined,
+                                        borders: { left: NO_BORDER, right: NO_BORDER } });
     }),
   }));
   return new Table({
     columnWidths: widths,
     width: { size: CONTENT_WIDTH, type: WidthType.DXA },
+    borders: { top: NO_BORDER, left: NO_BORDER, right: NO_BORDER, insideVertical: NO_BORDER,
+               bottom: hairline(), insideHorizontal: hairline() },
     rows: [headerRow, ...bodyRows],
   });
+}
+
+/** A one-cell box with a teal bar down its left edge, for the line a reader must not miss. */
+function callout(paragraphs) {
+  return new Table({
+    columnWidths: [CONTENT_WIDTH],
+    width: { size: CONTENT_WIDTH, type: WidthType.DXA },
+    borders: NO_BORDERS,
+    rows: [new TableRow({ children: [cell(paragraphs, CONTENT_WIDTH, {
+      fill: C.band_fill,
+      margins: { top: 140, bottom: 100, left: 220, right: 200 },
+      borders: { left: { style: BorderStyle.SINGLE, size: 36, color: C.accent },
+                 top: NO_BORDER, bottom: NO_BORDER, right: NO_BORDER },
+    })] })],
+  });
+}
+
+/** Metric tiles: big value over a small caps label, teal rule on top. */
+function tiles(metrics) {
+  const m = (metrics || []).filter((x) => x && !isBlank(x.value));
+  if (!m.length) return [];
+  const gap = 120;
+  const w = Math.floor((CONTENT_WIDTH - gap * (m.length - 1)) / m.length);
+  const widths = [];
+  m.forEach((_, i) => { widths.push(w); if (i < m.length - 1) widths.push(gap); });
+  const cells = [];
+  // Tiles are for a number or a date. A value that runs to a phrase still renders, but
+  // smaller, so one wordy tile cannot push the whole page onto a second sheet.
+  const longest = Math.max(...m.map((x) => String(x.value).length));
+  const vsize = longest <= 12 ? 34 : longest <= 20 ? 26 : 22;
+  m.forEach((x, i) => {
+    cells.push(cell([
+      para(String(x.value), { size: vsize, bold: true, color: C.heading, after: 20 }),
+      para(x.label, { size: 15, caps: true, color: C.muted, after: 0 }),
+    ], w, {
+      fill: C.tile_fill,
+      margins: { top: 140, bottom: 140, left: 160, right: 120 },
+      borders: { top: { style: BorderStyle.SINGLE, size: 24, color: C.accent },
+                 bottom: NO_BORDER, left: NO_BORDER, right: NO_BORDER },
+    }));
+    if (i < m.length - 1) cells.push(cell([para("", { after: 0 })], gap, { borders: NO_BORDERS }));
+  });
+  return [new Table({
+    columnWidths: widths,
+    width: { size: CONTENT_WIDTH, type: WidthType.DXA },
+    borders: NO_BORDERS,
+    rows: [new TableRow({ children: cells })],
+  })];
 }
 
 function money(v) {
@@ -295,7 +373,8 @@ function renderExecSummary(s) {
   if (d.source) { const sl = sourceLine(d.source); if (sl) out.push(sl); }
 
   const m = s.snapshot_metrics || [];
-  if (m.length) {
+  // With the At a glance page on, the tiles live there and are not repeated here.
+  if (m.length && !GLANCE) {
     out.push(subHeading("Snapshot"));
     const w = Math.floor(CONTENT_WIDTH / Math.max(m.length, 1));
     out.push(new Table({
@@ -1104,6 +1183,100 @@ function validate() {
   }
 }
 
+// ---------------------------------------------------------------- at a glance
+
+/** The first n sentences of a block of prose, for the one-page summary. */
+function firstSentences(text, n) {
+  const t = String(text || "").replace(/\s+/g, " ").trim();
+  if (!t) return "";
+  const parts = t.match(/[^.!?]+[.!?]+(\s|$)/g) || [t];
+  return parts.slice(0, n).join("").trim();
+}
+
+function coverBlock() {
+  const subBits = [];
+  if (meta.date) subBits.push(meta.date);
+  // The cover carries a name, not the reasoning behind it; that stays in section 1.
+  if (meta.account_owner) subBits.push(`Owner ${String(meta.account_owner).split(/\s*[(;.]/)[0]}`);
+  if (meta.author) subBits.push(`Prepared by ${meta.author}`);
+  if ((meta.domains || []).length) subBits.push(meta.domains.join(", "));
+  const kids = [
+    para("ACCOUNT PLAN", { size: 17, bold: true, color: C.accent, after: 60 }),
+    para(meta.account || "Account", { size: 52, bold: true, color: C.title_text, after: 80 }),
+  ];
+  if (subBits.length) kids.push(para(subBits.join("   |   "), { size: 18, color: C.title_sub, after: 0 }));
+  return new Table({
+    columnWidths: [CONTENT_WIDTH],
+    width: { size: CONTENT_WIDTH, type: WidthType.DXA },
+    borders: NO_BORDERS,
+    rows: [new TableRow({ children: [cell(kids, CONTENT_WIDTH, {
+      fill: C.title_fill, margins: { top: 300, bottom: 300, left: 360, right: 360 },
+      borders: { top: { style: BorderStyle.SINGLE, size: 36, color: C.accent },
+                 bottom: NO_BORDER, left: NO_BORDER, right: NO_BORDER },
+    })] })],
+  });
+}
+
+/**
+ * One page a reader can act on without opening the rest: the snapshot, where to
+ * spend first, the open opportunities, the people who matter and the next steps.
+ * Everything is read from the same sections the body renders, never restated.
+ */
+function atAGlance() {
+  const out = [];
+  const ex = S.exec_summary || {};
+  out.push(para("", { after: 160 }));
+  out.push(...tiles(ex.snapshot_metrics));
+
+  const g = S.gtm || {};
+  const lead = firstSentences(textOf(g.priority), 2)
+    || firstSentences(textOf(ex.strategic_narrative), 2);
+  if (lead) {
+    out.push(kicker(textOf(g.priority) ? "Where to spend first" : "Why this account matters"));
+    out.push(callout([para(lead, { size: 21, color: C.heading, after: 0 })]));
+  }
+
+  // Deal records with no amount and no close date are listed in section 4 but are not
+  // open opportunities a reader should act on, so the summary leaves them out and says so.
+  const allOpps = ((S.opportunities_footprint || {}).opportunities || []);
+  const live = allOpps.filter((o) => !isBlank(o.amount) || !isBlank(o.close_date));
+  const opps = live.length ? live : allOpps;
+  if (opps.length) {
+    out.push(kicker("Open opportunities"));
+    out.push(table(["Opportunity", "Stage", "Amount", "Close"],
+      opps.map((o) => [{ text: o.name || "", bold: true, color: C.heading }, o.stage || "unknown",
+                       money(o.amount), o.close_date || ""]),
+      [4360, 2200, 1500, 1300]));
+    const hidden = allOpps.length - opps.length;
+    if (hidden > 0) {
+      out.push(para(`Plus ${hidden} deal record${hidden > 1 ? "s" : ""} with no amount or close date, listed in the opportunities section.`,
+        { size: 16, color: C.muted, after: 0 }));
+    }
+  }
+
+  const known = ((S.stakeholders || {}).known || []).slice(0, 4);
+  if (known.length) {
+    out.push(kicker("Key people"));
+    out.push(table(["Name", "Role", "Last touched"],
+      known.map((p) => {
+        const band = freshnessBand(p.last_touched);
+        return [{ text: `${p.name || ""}${p.title ? `\n${p.title}` : ""}`, color: C.heading },
+                p.role || "", { text: `${p.last_touched || "unknown"}  ${band.label}`, color: band.color }];
+      }),
+      [4360, 2600, 2400]));
+  }
+
+  const steps = ((S.next_steps_map || {}).steps || []).slice(0, 3);
+  if (steps.length) {
+    out.push(kicker("Next steps"));
+    out.push(table(["#", "Step", "Owner", "Target"],
+      steps.map((st, i) => [{ text: String(i + 1), bold: true, color: C.accent }, st.text || "",
+                            st.owner || "Not named", st.target || ""]),
+      [500, 5160, 1700, 2000]));
+  }
+  return out;
+}
+
 // ---------------------------------------------------------------- build
 
 function build() {
@@ -1111,24 +1284,12 @@ function build() {
 
   const children = [];
 
-  children.push(new Paragraph({
-    spacing: { after: 60 },
-    children: [new TextRun({ text: "ACCOUNT PLAN", font: FONT, size: 18, bold: true, color: C.muted })],
-  }));
-  children.push(new Paragraph({
-    spacing: { after: 60 },
-    children: [new TextRun({ text: meta.account || "Account", font: FONT, size: 40, bold: true, color: C.heading })],
-  }));
-  const subBits = [];
-  if (meta.date) subBits.push(meta.date);
-  if (meta.author) subBits.push(`Prepared by ${meta.author}`);
-  if ((meta.domains || []).length) subBits.push(`${meta.domains.length} domain${meta.domains.length > 1 ? "s" : ""} in scope`);
-  if (subBits.length) {
-    children.push(new Paragraph({
-      spacing: { after: 200 },
-      border: { bottom: { style: BorderStyle.SINGLE, size: 8, color: C.heading, space: 8 } },
-      children: [new TextRun({ text: subBits.join("  |  "), font: FONT, size: 19, color: C.muted })],
-    }));
+  children.push(coverBlock());
+  if (GLANCE) {
+    children.push(...atAGlance());
+    children.push(new Paragraph({ children: [new PageBreak()] }));
+  } else {
+    children.push(para("", { after: 200 }));
   }
 
   (DOC.sections || []).forEach((sec) => {

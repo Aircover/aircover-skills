@@ -13,7 +13,7 @@ deal page and the workbook never disagree.
 
 | Tab | Holds | Built from |
 |---|---|---|
-| 1 Deal Overview | Header block and four synopsis questions | CRM plus MEDDPICC and Close Plan agents |
+| 1 Summary | One page: header facts, overall score, a bar per bucket, top 3 risks, next 5 actions, key people, the four deal story questions | CRM, agents, and formulas into tabs 2 to 4 |
 | 2 Health Score | 26 items in five buckets, scored live | All three agents |
 | 3 Action Plan | One row per item that is not a Yes | Generated from tab 2 |
 | 4 Stakeholder Map | Seniority x function heat map and persona detail | Meeting attendance plus Stakeholder Coverage |
@@ -33,8 +33,10 @@ deal page and the workbook never disagree.
 ## Bundled resources
 - `config.json` - everything customer-specific: environment, agent discovery, the full cell
   map, the five buckets, marker glyphs, colours. Change this, not the code, to retarget.
-- `assets/Close_Plan_TEMPLATE.xlsx` - the team template, four tabs. Holds all styling, merged
-  blocks, the score formulas, and the dropdowns. Do not rebuild it, fill it.
+- `assets/Close_Plan_TEMPLATE.xlsx` - the team template, four tabs, in the Aircover palette.
+  Holds all styling, merged blocks, the score formulas, and the dropdowns. Do not rebuild it,
+  fill it. The Summary tab's score, bars, next actions and key people are formulas into the
+  other tabs, so they follow the AE's edits.
 - `scripts/fill_close_plan.py` - template-agnostic engine. Reads `config.json`, clears mapped
   cells, writes only what you supply, preserves everything else. Requires openpyxl.
 - `scripts/build_template.py` - regenerates the blank template asset, reading the
@@ -136,8 +138,8 @@ reporting the deal as not found or silently retrying without the filter.
 `get_deal(prospect_org, deal_id)` returns a `crm` block and a `completed_meetings` array.
 Call it once and reuse it. Read the CRM block through `config.crm`, never by reaching for
 `sfdc_*` directly. Write the block to a file and pass `--crm crm.json` so the engine resolves
-it via `resolve_crm`: amount -> ARR (B4), close date -> Close Date (B3), stage -> Deal in
-Forecast (D4), opp id -> Opp Link (B2). Anything you set explicitly in `values.json` wins, so a
+it via `resolve_crm`: amount -> Amount, close date -> Close date, stage -> Stage, opp id ->
+CRM, all on the Summary tab's header facts (cells in `config.header_cells`). Anything you set explicitly in `values.json` wins, so a
 person's correction in step 4 is never overwritten.
 
 `resolve_crm` also returns `stage_band`, resolved against `crm.stage_taxonomy`. The forecast
@@ -383,15 +385,24 @@ often go missing on a first pass:
   correct output.
 - **Fill the "?" bubbles honestly.** A sparse Stakeholder Map that hides missing personas
   defeats the tab. Place a gap bubble wherever the deal needs a persona no call has produced.
-- **A14 is never blank.** Observed and expected value, then quantified ROI not found, then the
+- **The vendor impact answer is never blank.** Observed and expected value, then quantified ROI not found, then the
   metrics to establish, choosing ones actually attributable to the deployment.
-- **A12 leads with primary use case, then secondary.** The ranking is the answer. A10 is the
-  deployment as it stands today; keep them distinct.
+- **The use case answer leads with primary, then secondary.** The ranking is the answer. The
+  "how are they using it today" answer is the deployment as it stands; keep them distinct.
 - **The coverage note is not optional.** Write `values.coverage_note` from the step 5
   worklist: how many meetings, the window they span, where coverage stops against the CRM
   close date, and how many held meetings produced no transcript. `output_standard.md`
   section 6b has the shape. The engine warns if it is missing and that warning is a build
   failure, exactly like a missing Recommended Action.
+
+- **Pick the Summary's risks and next actions.** Write `values.summary.risks`: the three
+  things most likely to stop this deal closing on its date, one line each, most serious first,
+  each naming the evidence (a date, a person, a missing step). Write
+  `values.summary.next_actions`: up to five Health Score item keys, in the order the AE should
+  work them, choosing what most moves the close date rather than bucket order. Each must be an
+  item that has an Action Plan row (not a Yes). The Summary shows the first sentence of each
+  action, so write that sentence to stand alone. Without these the engine falls back to the
+  items scored No, in sheet order, and says so; that fallback is a safety net, not the output.
 
 Then run the section 8 consistency pass: tabs agree, map against row 10, overview against the
 buckets, banned language sweep, word budgets.
@@ -403,7 +414,7 @@ python fill_close_plan.py --template Close_Plan_TEMPLATE.xlsx --values values.js
   --crm crm.json --out "Close Plan - {Company} - {YYYY-MM-DD}.xlsx" --config config.json
 ```
 The engine prints the five bucket percentages, the overall, the action row count, and any
-missing-action or missing-coverage-note warnings. Read that output before presenting: it is
+missing-action, missing-coverage-note or Summary fallback notes. Read that output before presenting: it is
 the fastest check that the mapping did what you intended.
 
 Before writing anything the engine preflights the config against the template and exits on a

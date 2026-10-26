@@ -1,6 +1,6 @@
 # Account Plan (Aircover skill)
 
-Build or update a strategic account plan for a whole account: every opportunity, meeting and stakeholder across the account's deals in Aircover, enriched with public company research. The plan covers the snapshot, the customer's business, the stakeholder map, footprint and whitespace, cross-functional GTM tracks, next steps, and the competitive picture. Every claim is labelled with its source: a call, the CRM, a public source, or the account team.
+Build or update a strategic account plan for a whole account: every opportunity, meeting and stakeholder across the account's deals in Aircover, enriched with public company research. It opens with a one-page At a glance summary (snapshot, where to spend first, open opportunities, key people, next steps), then covers the snapshot, the customer's business, the stakeholder map, footprint and whitespace, cross-functional GTM tracks, next steps, and the competitive picture. Every claim is labelled with its source: a call, the CRM, a public source, or the account team.
 
 This is an internal seller-facing artifact. It runs as a skill inside an assistant connected to the Aircover MCP server.
 

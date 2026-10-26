@@ -11,7 +11,8 @@ Usage:
         --out OUTPUT.xlsx [--config config.json] [--crm crm.json]
 
 Tabs:
-  1 Deal Overview    header block + four synopsis questions
+  1 Summary          header facts, overall score, bucket bars, top risks, next
+                     actions, key people and the four deal story questions
   2 Health Score     26 items in five buckets, live per-bucket and overall formulas
   3 Action Plan      one generated row per item whose marker is not "Yes"
   4 Stakeholder Map  seniority x function heat map + persona detail table
@@ -39,6 +40,8 @@ values.json format (every field optional; omit what you do not want to touch):
   "actions":  {"security_review": {"action": "...", "owner": "...",
                                    "status": "Not started", "comments": "..."}},
   "coverage_note": "what the score can and cannot see  (REQUIRED)",
+  "summary":  {"risks": ["one line each, most serious first", ...],
+               "next_actions": ["economic_buyer", "security_review", ...]},
   "stakeholders": {
     "csuite": "text",
     "grid": [{"function": "IT", "seniority": "Director",
@@ -61,6 +64,9 @@ try:
     from openpyxl.utils import get_column_letter
 except ImportError:
     sys.exit("openpyxl is required. Install with: pip install openpyxl --break-system-packages")
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from build_template import summary_layout  # noqa: E402  one definition of the Summary rows
 
 
 DEFAULT_COL_W = 8.43
@@ -510,7 +516,7 @@ def fill_actions(ws, health_ws, cfg, vals):
         ws.row_dimensions[r].height = None
 
     supplied = vals.get("actions") or {}
-    missing, row = [], first
+    missing, row, rows_by_item = [], first, {}
     for bkey, _bspec, ikey, hrow in bucket_items(cfg):
         if (vals.get("health") or {}).get(ikey) == "yes":
             continue
@@ -526,15 +532,18 @@ def fill_actions(ws, health_ws, cfg, vals):
             "status", (acfg.get("status_dropdown") or {}).get("default"))
         ws[f"{cols['comments']}{row}"] = entry.get("comments")
 
+        rows_by_item[ikey] = row
         tint = (acfg.get("bucket_tints") or {}).get(bkey)
         b = ws[f"{cols['bucket']}{row}"]
-        b.font = Font(name="Calibri", size=9, bold=True)
+        b.font = Font(name="Calibri", size=9, bold=True, color="FF1B2A4A")
         b.alignment = Alignment(vertical="top", wrap_text=True)
         if tint:
             b.fill = PatternFill("solid", fgColor=tint)
         for col in (cols["gap"], cols["action"], cols["owner"],
                     cols["status"], cols["comments"]):
             ws[f"{col}{row}"].alignment = Alignment(vertical="top", wrap_text=True)
+            ws[f"{col}{row}"].font = Font(name="Calibri", size=10, color="FF3D4F6F")
+        ws[f"{cols['status']}{row}"].alignment = Alignment(horizontal="center", vertical="top")
         autofit_row(ws, row, list(cols.values()), acfg.get("row_height", 43.5))
 
         if not entry.get("action"):
@@ -545,7 +554,12 @@ def fill_actions(ws, health_ws, cfg, vals):
     if sd.get("enabled") and row > first:
         set_validation(ws, [f"{cols['status']}{r}" for r in range(first, row)],
                        sd.get("options") or [])
-    return row - first, missing
+    # Filter buttons on the header row, so an AE can pull up only their own rows.
+    if row > first:
+        c0 = min(cols.values())
+        c1 = max(cols.values())
+        ws.auto_filter.ref = f"{c0}{first - 1}:{c1}{row - 1}"
+    return row - first, missing, rows_by_item
 
 
 def fill_stakeholders(ws, cfg, vals):
@@ -561,7 +575,7 @@ def fill_stakeholders(ws, cfg, vals):
         c = ws[coord]
         c.value = text
         c.fill = PatternFill("solid", fgColor=spec["fill"])
-        c.font = Font(name="Calibri", size=10, color=spec["font"])
+        c.font = Font(name="Calibri", size=10, bold=bool(text), color=spec["font"])
         c.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
 
     # C-Suite band
@@ -630,7 +644,7 @@ def fill_stakeholders(ws, cfg, vals):
         text = (data.get("unplaced") or "").strip()
         if text:
             cell.value = text
-            cell.font = Font(name="Calibri", size=9, color="FF666666")
+            cell.font = Font(name="Calibri", size=9, italic=True, color="FF7A8CA0")
             cell.alignment = Alignment(vertical="top", wrap_text=True)
             autofit(ws, up, bullets=False)
 
@@ -652,6 +666,70 @@ def fill_stakeholders(ws, cfg, vals):
     # or a Stakeholder Coverage role line), not that the committee is genuinely unmappable.
     named_cells = sum(1 for pin in (data.get("grid") or []) if pin.get("name"))
     return mapped, len(p["roles"]), named_cells, noteless
+
+
+# --------------------------------------------------------------------- summary
+
+def fill_summary(ws, cfg, vals, rows_by_item):
+    """Top risks and next actions on the Summary tab.
+
+    Risks are written as text. Next actions are FORMULAS into the Action Plan rows,
+    so an AE who rewrites an action or moves its status sees the Summary follow.
+    Only the first sentence of each action shows here; the exit criterion stays on
+    the Action Plan, which keeps the Summary to one page.
+    """
+    lay = summary_layout(cfg)
+    aps = cfg["template"]["actions_sheet"]
+    acols = cfg["actions"]["columns"]
+    data = vals.get("summary") or {}
+    health = vals.get("health") or {}
+    notes = []
+
+    risks = [str(r).strip() for r in (data.get("risks") or []) if str(r).strip()]
+    if not risks:
+        notes.append("summary.risks not supplied; listed the first items scored No instead")
+        hs = ws.parent[cfg["template"]["health_sheet"]]
+        lcol = cfg["health"]["label_col"]
+        # A bare checklist label ("Procurement process started") reads as good news,
+        # so the fallback says plainly that the item is missing.
+        risks = ["Not in place: " + shorten_label(hs[f"{lcol}{hrow}"].value)
+                 for _, _, ikey, hrow in bucket_items(cfg) if health.get(ikey) == "no"]
+    elif len(risks) > len(lay["risk_rows"]):
+        notes.append("summary.risks has %d entries; the Summary shows the first %d"
+                     % (len(risks), len(lay["risk_rows"])))
+    for row in lay["risk_rows"]:
+        ws[f"B{row}"].value = None
+    for row, text in zip(lay["risk_rows"], risks):
+        ws[f"B{row}"].value = "\u2022 " + text
+        autofit(ws, f"B{row}", bullets=False)
+
+    order = [k for k in (data.get("next_actions") or []) if k in rows_by_item]
+    unknown = [k for k in (data.get("next_actions") or []) if k not in rows_by_item]
+    if unknown:
+        notes.append("summary.next_actions names items with no Action Plan row (scored Yes "
+                     "or misspelled): " + ", ".join(unknown))
+    if not order:
+        notes.append("summary.next_actions not supplied; took No items first, then the rest")
+        rank = {"no": 0, "unknown": 1, "partial": 2}
+        order = sorted(rows_by_item, key=lambda k: (rank.get(health.get(k), 3),
+                                                    rows_by_item[k]))
+    width = sum(ws.column_dimensions[c].width or DEFAULT_COL_W for c in "CDEF")
+    for i, row in enumerate(lay["action_rows"]):
+        for c in ("B", "C", "G", "I"):
+            ws[f"{c}{row}"].value = None
+        if i >= len(order):
+            continue
+        arow = rows_by_item[order[i]]
+        src = f"'{aps}'!{acols['action']}{arow}"
+        ws[f"B{row}"] = i + 1
+        ws[f"C{row}"] = f'=IFERROR(LEFT({src},FIND(". ",{src})),{src})'
+        ws[f"G{row}"] = f"='{aps}'!{acols['owner']}{arow}"
+        ws[f"I{row}"] = f"='{aps}'!{acols['status']}{arow}"
+        action = str((vals.get("actions") or {}).get(order[i], {}).get("action") or "")
+        first = action.split(". ")[0]
+        lines = max(1, -(-len(first) // max(int(width * 1.2), 20)))
+        ws.row_dimensions[row].height = max(22, lines * LINE_PT + 6)
+    return notes
 
 
 # ------------------------------------------------------------- coverage note
@@ -684,7 +762,7 @@ def fill_coverage_note(cfg, hs, vals):
 
 # ------------------------------------------------------------ live colouring
 
-def add_live_colors(cfg, hs, aps, sms):
+def add_live_colors(cfg, hs, aps, sms, sus=None):
     """Colour every marker by RULE, not by a fill painted at build time.
 
     A static PatternFill is a snapshot. The AE picks a new value from the dropdown,
@@ -762,6 +840,17 @@ def add_live_colors(cfg, hs, aps, sms):
                 if aps[f"{gcol}{r}"].value]
         if rows:
             rules(aps, [f"{scol}{rows[0]}:{scol}{rows[-1]}"], palette)
+
+    # Summary: the status and engagement cells are formulas, so they need the same
+    # rules as their sources or they would show plain text.
+    if sus is not None:
+        lay = summary_layout(cfg)
+        a0, a1 = lay["action_rows"][0], lay["action_rows"][-1]
+        if palette:
+            rules(sus, [f"I{a0}:I{a1}"], palette)
+        p0, p1 = lay["people_rows"][0], lay["people_rows"][-1]
+        rules(sus, [f"H{p0}:H{p1}"],
+              {eng[k]["text"]: eng[k] for k in ("engaged", "emerging", "gap")})
 
 
 def wrap_health_labels(cfg, hs):
@@ -842,12 +931,13 @@ def main():
 
     health = vals.get("health") or {}
     fill_health(hs, cfg, health)
-    n_actions, missing = fill_actions(aps, hs, cfg, vals)
+    n_actions, missing, rows_by_item = fill_actions(aps, hs, cfg, vals)
+    summary_notes = fill_summary(ws, cfg, vals, rows_by_item)
     mapped, total_personas, named_cells, noteless = fill_stakeholders(sms, cfg, vals)
 
     have_note = fill_coverage_note(cfg, hs, vals)
 
-    add_live_colors(cfg, hs, aps, sms)
+    add_live_colors(cfg, hs, aps, sms, ws)
 
     wrap_health_labels(cfg, hs)
 
@@ -873,6 +963,8 @@ def main():
               "'Seniority not stated' row instead of the unplaced line.")
     if missing:
         print("WARNING: no recommended action supplied for: " + ", ".join(missing))
+    for note in summary_notes:
+        print("NOTE (Summary tab): " + note)
     if not have_note:
         print("WARNING: no coverage_note supplied. The overall percentage is coverage of "
               "what the calls in scope can evidence, not deal health, and the workbook has "

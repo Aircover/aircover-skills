@@ -1,5 +1,20 @@
 # Close Plan changelog
 
+## V5
+New look, same scoring. The workbook is restyled in the Aircover palette (navy headers, teal
+accents, soft status colours, no gridlines) and the Deal Overview tab is replaced by a
+**Summary** tab that reads the deal on one page: header facts, the overall score, a bar per
+bucket with the weakest flagged, the top three risks, the next five actions with owner and
+status, the key people with engagement, and the four deal story questions. The score, bars,
+next actions and people are formulas into the other tabs, so an AE's edits flow through.
+- values.json gains an optional `summary` block: `risks` (three lines) and `next_actions`
+  (up to five Health Score item keys, in priority order). Without it the engine falls back
+  to the items scored No and prints a note.
+- The Action Plan has filter buttons and a frozen header row.
+- `build_template.summary_layout` is the one definition of the Summary rows; the builder
+  refuses to run if `header_cells`, `synopsis_cells` or `label_overrides` disagree with it.
+- Health Score, Action Plan and Stakeholder Map keep their names and row positions.
+
 ## V4.2
 Instructions trimmed by about a quarter with no change to the engine, template or scoring: the
 version notes moved out of SKILL.md into this file, and the configuration, stage banding and
