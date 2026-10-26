@@ -869,6 +869,57 @@ def wrap_health_labels(cfg, hs):
         autofit_row(hs, row, [lcol], 15.0)
 
 
+# ------------------------------------------------------------------ solid bars
+
+X14 = "http://schemas.microsoft.com/office/spreadsheetml/2009/9/main"
+XM = "http://schemas.microsoft.com/office/excel/2006/main"
+
+
+def solid_databars(path, sheet_index):
+    """Turn the Summary's data bars from gradient to solid, after openpyxl has saved.
+
+    openpyxl only writes the Excel 2007 data bar, which fades to white and never reaches
+    zero length. Excel 2010+ reads an x14 extension for a solid, zero-based bar. openpyxl
+    drops that extension on load, so it is added to the saved file here, in the same
+    XML Excel itself writes. Readers without x14 support fall back to the gradient bar.
+    """
+    import uuid
+    import zipfile
+
+    name = f"xl/worksheets/sheet{sheet_index}.xml"
+    with zipfile.ZipFile(path) as z:
+        items = [(i, z.read(i.filename)) for i in z.infolist()]
+    xml = dict((i.filename, d) for i, d in items)[name].decode("utf-8")
+
+    rule_re = re.compile(r'(<conditionalFormatting sqref="([^"]+)"><cfRule type="dataBar"[^>]*>'
+                         r'<dataBar[^>]*>.*?</dataBar>)(</cfRule>)')
+    exts = []
+
+    def patch(m):
+        gid = "{%s}" % str(uuid.uuid4()).upper()
+        body = re.sub(r'<color rgb="00', '<color rgb="FF', m.group(1))
+        exts.append(
+            f'<x14:conditionalFormatting xmlns:xm="{XM}"><x14:cfRule type="dataBar" id="{gid}">'
+            '<x14:dataBar minLength="0" maxLength="100" gradient="0">'
+            '<x14:cfvo type="num"><xm:f>0</xm:f></x14:cfvo>'
+            '<x14:cfvo type="num"><xm:f>1</xm:f></x14:cfvo>'
+            '<x14:negativeFillColor rgb="FFD94F4F"/><x14:axisColor rgb="FF000000"/>'
+            f'</x14:dataBar></x14:cfRule><xm:sqref>{m.group(2)}</xm:sqref></x14:conditionalFormatting>')
+        return (body + f'<extLst><ext uri="{{B025F937-C7B1-47D3-B67F-A62EFF666E3E}}" '
+                f'xmlns:x14="{X14}"><x14:id>{gid}</x14:id></ext></extLst>' + m.group(3))
+
+    xml = rule_re.sub(patch, xml)
+    if not exts or "<extLst><ext uri=\"{78C0D931" in xml:
+        return
+    xml = xml.replace("</worksheet>",
+                      f'<extLst><ext uri="{{78C0D931-6437-407d-A8EE-F0AAD7539E65}}" xmlns:x14="{X14}">'
+                      f'<x14:conditionalFormattings>{"".join(exts)}</x14:conditionalFormattings>'
+                      '</ext></extLst></worksheet>')
+    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
+        for info, data in items:
+            z.writestr(info, xml.encode("utf-8") if info.filename == name else data)
+
+
 # ------------------------------------------------------------------------ main
 
 def main():
@@ -942,6 +993,7 @@ def main():
     wrap_health_labels(cfg, hs)
 
     wb.save(a.out)
+    solid_databars(a.out, wb.sheetnames.index(t["overview_sheet"]) + 1)
 
     per, overall = compute_scores(cfg, health)
     print("wrote", a.out)

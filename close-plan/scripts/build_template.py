@@ -25,6 +25,7 @@ import json
 import os
 
 from openpyxl import Workbook
+from openpyxl.formatting.rule import DataBarRule
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.datavalidation import DataValidation
@@ -276,9 +277,8 @@ def build_summary(wb, cfg):
     for c in ("H", "I"):
         ws[f"{c}{last_row}"].fill = fill(OFFWHITE)
 
-    # Readiness: bucket name, a bar drawn by formula over a grey track, the %, a flag.
+    # Readiness: bucket name, a bar over a grey track, the %, a flag.
     section(ws, lay["readiness_title"], "READINESS BY BUCKET")
-    bar_len = cfg["summary"].get("bar_length", 24)
     score_cells = []
     for bkey, row in lay["bucket_rows"].items():
         bspec = cfg["health"]["buckets"][bkey]
@@ -288,16 +288,26 @@ def build_summary(wb, cfg):
         ws[f"B{row}"].font = font(10, True, NAVY)
         ws[f"B{row}"].alignment = Alignment(vertical="center")
         ws.merge_cells(f"D{row}:G{row}")
-        ws[f"D{row}"] = f'=REPT("█",ROUND({src}*{bar_len},0))'
-        ws[f"D{row}"].font = Font(name=FONT, size=10, color=TEAL)
+        # Excel's own data bar over the score, with the number hidden by the ";;;"
+        # format. A row of block characters drew visible seams between glyphs.
+        ws[f"D{row}"] = f"={src}"
+        ws[f"D{row}"].number_format = ";;;"
         ws[f"D{row}"].fill = fill(TRACK)
-        ws[f"D{row}"].alignment = Alignment(vertical="center")
+        # Thick white top and bottom edges leave a gap between neighbouring bars.
+        gap = Side(style="thick", color=WHITE)
+        for c in range(4, 8):
+            ws.cell(row=row, column=c).border = Border(top=gap, bottom=gap)
         ws[f"H{row}"] = f"={src}"
         ws[f"H{row}"].number_format = "0%"
         ws[f"H{row}"].font = font(11, True, NAVY)
         ws[f"H{row}"].alignment = Alignment(horizontal="center", vertical="center")
         score_cells.append(f"H{row}")
         ws.row_dimensions[row].height = 20
+    rows = list(lay["bucket_rows"].values())
+    ws.conditional_formatting.add(
+        f"D{rows[0]}:D{rows[-1]}",
+        DataBarRule(start_type="num", start_value=0, end_type="num", end_value=1,
+                    color=TEAL[2:], showValue=False))
     first, last = score_cells[0], score_cells[-1]
     for cell in score_cells:
         row = cell[1:]

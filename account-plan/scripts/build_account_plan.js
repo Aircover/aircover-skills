@@ -271,7 +271,10 @@ function table(headers, rows, widths) {
     tableHeader: true,
     children: headers.map((h, i) => cell(
       [para(h, { bold: true, size: 18, after: 0, color: C.table_header_text })],
-      widths[i], { fill: C.table_header_fill, borders: { left: NO_BORDER, right: NO_BORDER } },
+      // Side borders in the header's own colour, so no renderer draws a white seam between cells.
+      widths[i], { fill: C.table_header_fill, borders: {
+        left: { style: BorderStyle.SINGLE, size: 4, color: C.table_header_fill },
+        right: { style: BorderStyle.SINGLE, size: 4, color: C.table_header_fill } } },
     )),
   });
   const bodyRows = rows.map((r, ri) => new TableRow({

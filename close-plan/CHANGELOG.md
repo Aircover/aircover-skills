@@ -11,6 +11,8 @@ next actions and people are formulas into the other tabs, so an AE's edits flow 
   (up to five Health Score item keys, in priority order). Without it the engine falls back
   to the items scored No and prints a note.
 - The Action Plan has filter buttons and a frozen header row.
+- Bucket bars are Excel data bars, written solid (zero-based) by the engine after saving;
+  readers without Excel 2010 data bar support show the older gradient bar.
 - `build_template.summary_layout` is the one definition of the Summary rows; the builder
   refuses to run if `header_cells`, `synopsis_cells` or `label_overrides` disagree with it.
 - Health Score, Action Plan and Stakeholder Map keep their names and row positions.

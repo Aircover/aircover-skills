@@ -63,8 +63,7 @@
   "summary": {
     "_comment": "The Summary tab: one page that answers 'where is this deal'. The overall score, bucket bars, next actions and key people are formulas into the other tabs, so they follow the AE's edits. risk_count and action_count set how many rows each block gets; changing either moves every block below it, so regenerate the template with build_template.py and update header_cells, synopsis_cells and label_overrides to what it reports. Top risks are written from values.json `summary.risks`; next actions from `summary.next_actions` (Health Score item keys, in priority order).",
     "risk_count": 3,
-    "action_count": 5,
-    "bar_length": 36
+    "action_count": 5
   },
   "health": {
     "_comment": "Five fixed buckets. Each item is worth an equal share of its bucket: Yes 100%, In Progress 50%, No and Needs Input 0%. Written as a live formula so the AE's own overrides recompute. Needs Input scores zero on purpose, so missing evidence cannot raise the score. Overall = average of the five, weighted equally. Anything not Yes still generates an Action Plan row.",

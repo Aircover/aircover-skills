@@ -63,13 +63,17 @@ What customers are asking for across all your calls: feature requests, gaps, and
 
 ### Account Plan
 A strategic plan for a whole account: every opportunity, meeting and stakeholder, plus public research on the company. Shows where the growth is, who is not covered, and the plays to run. Say "update my account plan" after your next call and it adds only what is new.
-**You get:** a Word doc or slide deck, also saved to the deal in Aircover.
+**You get:** a Word doc (or slide deck) that opens with a one-page At a glance summary, also saved to the deal in Aircover.
 **[Download Account Plan](https://github.com/Aircover/aircover-skills/releases/download/account-plan-v1.1.0/account-plan.skill)**
+
+<img width="900" alt="Account Plan, At a glance page (sample data)" src="account-plan/images/account-plan-at-a-glance.png" />
 
 ### Close Plan
 A scored close plan for one deal: stakeholder alignment, technical validation, commercial, timeline and competition, with a recommended action for every gap and a stakeholder heat map.
-**You get:** a four-tab Excel workbook, also saved to the deal in Aircover.
+**You get:** an Excel workbook that opens with a one-page Summary (score, top risks, next actions, key people), also saved to the deal in Aircover.
 **[Download Close Plan](https://github.com/Aircover/aircover-skills/releases/download/close-plan-v5.0.0/close-plan.skill)**
+
+<img width="900" alt="Close Plan, Summary tab (sample data)" src="close-plan/images/close-plan-summary.png" />
 
 ## Good to know
 
