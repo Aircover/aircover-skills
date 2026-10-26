@@ -1,0 +1,655 @@
+{
+  "_comment": "Complete schema example. The account, people, figures, and sources are fictional; copy the shape, never the content. Optional features shown here: `manual: true` on an account-team-supplied opportunity (no deal_key, no meetings, matching coverage row with 0 analyzed); `dimensions` on the strategic narrative (the five-part checklist in SKILL.md step 8); `points` on any block, which renders bullets instead of prose and is required for pptx output; `account_team` plus `account_team_note`; and `budget_cycle` with a declared `basis`.",
+  "meta": {
+    "account": "Northwind Logistics",
+    "vendor": {
+      "name": "Northstar",
+      "email_domain": "northstar.io",
+      "resolution_note": "Detected from the internal side of the attendee split across 34 meetings. Casing taken from the org's agent titles."
+    },
+    "date": "2026-08-22",
+    "author": "[plan author]",
+    "domains": [
+      "northwind.com",
+      "northwind-eu.com"
+    ],
+    "account_owner": "Priya Raman",
+    "evidence_window": {
+      "start": "2026-02-14",
+      "end": "2026-08-19"
+    },
+    "format": "pptx",
+    "template": "unbranded",
+    "deal_keys": [
+      "acme.com/1",
+      "acme.com/4",
+      "acme-eu.com/2"
+    ],
+    "value_basis": "Values from the CRM amount field, confirmed by the account team on 2026-08-22.",
+    "revisions": [
+      {
+        "date": "2026-08-22",
+        "meetings_added": 0,
+        "summary": "Initial build."
+      }
+    ]
+  },
+  "sections": {
+    "exec_summary": {
+      "account_details": {
+        "industry": "Third party logistics and freight forwarding",
+        "revenue": "$4.1B FY25",
+        "employees": "18,400",
+        "hq": "Rotterdam, with regional hubs in Atlanta and Singapore",
+        "source": "FY25 annual report, retrieved 2026-08-22"
+      },
+      "snapshot_metrics": [
+        {
+          "label": "Open opportunities",
+          "value": "3"
+        },
+        {
+          "label": "Open value",
+          "value": "$441,000"
+        },
+        {
+          "label": "Meetings analyzed",
+          "value": "34"
+        },
+        {
+          "label": "Last customer meeting",
+          "value": "12 days ago"
+        }
+      ],
+      "strategic_narrative": {
+        "text": "Northwind is the reference account for the freight vertical. Both open opportunities sit in business units that no competitor has entered, and the EU entity runs a separate procurement path that would double the footprint without a new security review.",
+        "source": "account team, drawn from CRM and the coverage appendix",
+        "recommendation": true,
+        "dimensions": [
+          {
+            "label": "Expansion headroom",
+            "text": "Atlanta and Singapore run the same exception workflow and have never appeared on a call. Recommendation."
+          },
+          {
+            "label": "Referenceability",
+            "text": "Devlin presented the internal business case to the COO and has offered to speak at the freight user group. Evidenced, 2026-07-22."
+          },
+          {
+            "label": "Logo and segment credibility",
+            "text": "First named freight forwarder in the base; opens a vertical currently entered cold. Recommendation."
+          },
+          {
+            "label": "Design partnership",
+            "text": "The exception webhook and the customs field mapping both originated here. Evidenced, 2026-06-18."
+          },
+          {
+            "label": "Strategic displacement",
+            "text": "INPUT NEEDED: does the internal build team have funded headroom to revive the shelved dashboard."
+          }
+        ]
+      },
+      "relationship_health": {
+        "text": "Three open opportunities worth $441,000 across two domains, one of them supplied by the account team with no call evidence, plus $210,000 closed won in the last 24 months. Meeting cadence has held at roughly weekly since March and the most recent customer meeting was 2026-08-10. Coverage is concentrated: 26 of 34 meetings involve the Platform Engineering group, and the EU entity has appeared on 4 calls in six months.",
+        "source": "CRM and meeting metadata, 34 meetings"
+      },
+      "needs_input": []
+    },
+    "landscape": {
+      "business_priorities": [
+        {
+          "title": "Cut cross-border transit exceptions by a third by FY27",
+          "text": "Named on the Q2 earnings call as the primary operating target for the EU network, owned by the COO.",
+          "source": "Q2 2026 earnings call, retrieved 2026-08-22",
+          "ledger": [
+            "example-q2"
+          ]
+        }
+      ],
+      "challenges": [
+        {
+          "title": "Exception handling is manual across three systems",
+          "text": "The operations team reconciles exceptions by hand between the TMS, the customs broker portal, and a spreadsheet. Two named analysts spend most of a shift on it. So what: this is the mechanism behind the COO's FY27 target, and it is the use case the expansion opportunity addresses.",
+          "evidence": "We have two people whose whole job is chasing exceptions between three screens.",
+          "source": "M. Devlin, Director of Operations, 2026-06-18",
+          "ledger": [
+            "example-q2"
+          ],
+          "evidence_agent": "transcript <meeting_id> @00:00:00"
+        }
+      ],
+      "kpis": [
+        {
+          "title": "Exception rate per thousand shipments",
+          "text": "The metric the operations group reports upward each month.",
+          "source": "M. Devlin, Director of Operations, 2026-06-18",
+          "ledger": [
+            "example-q2"
+          ]
+        }
+      ],
+      "industry_trends": [
+        {
+          "title": "EU customs data requirements tighten in 2027",
+          "text": "The new filing regime adds fields that Northwind's broker portal does not currently capture, which lands directly on the exception workflow above.",
+          "source": "European Commission implementing regulation summary, retrieved 2026-08-22",
+          "ledger": [
+            "example-q2"
+          ]
+        }
+      ],
+      "swot": {
+        "strengths": [
+          {
+            "text": "Owns bonded warehouse capacity at three of the five largest EU entry points, which competitors lease.",
+            "source": "FY25 annual report",
+            "ledger": [
+              "example-q2"
+            ]
+          },
+          {
+            "text": "Investment grade balance sheet with headroom for network capex, which funds multi-year platform commitments.",
+            "source": "FY25 annual report",
+            "ledger": [
+              "example-q2"
+            ]
+          }
+        ],
+        "weaknesses": [
+          {
+            "text": "Systems integration debt from the 2023 acquisition is unresolved; the EU entity still runs a separate TMS.",
+            "source": "M. Devlin, 2026-06-18",
+            "ledger": [
+              "example-q2"
+            ]
+          },
+          {
+            "text": "Exception handling is manual across three systems, tying up two analysts a shift.",
+            "source": "M. Devlin, Director of Operations, 2026-06-18",
+            "ledger": [
+              "example-q2"
+            ]
+          }
+        ],
+        "opportunities": [
+          {
+            "text": "Freight brokerage consolidation is leaving mid-market shippers without a regional provider.",
+            "source": "Trade press analysis, retrieved 2026-08-22",
+            "ledger": [
+              "example-q2"
+            ]
+          },
+          {
+            "text": "The 2027 customs filing regime rewards operators who can produce clean structured data at the border.",
+            "source": "European Commission implementing regulation summary, retrieved 2026-08-22",
+            "ledger": [
+              "example-q2"
+            ]
+          }
+        ],
+        "threats": [
+          {
+            "text": "Two digital-native forwarders have entered the Rotterdam to Atlanta lane with published rates.",
+            "source": "Q2 2026 earnings call",
+            "ledger": [
+              "example-q2"
+            ]
+          },
+          {
+            "text": "Shipper-side rate transparency tools are compressing margin on standard lanes.",
+            "source": "Trade press analysis, retrieved 2026-08-22",
+            "ledger": [
+              "example-q2"
+            ]
+          }
+        ]
+      },
+      "hypotheses": [
+        {
+          "text": "Engineering groups outside Platform hold their own tooling budgets.",
+          "question": "Ask Raman which groups outside Platform Engineering approve their own tooling spend."
+        }
+      ],
+      "needs_input": []
+    },
+    "stakeholders": {
+      "known": [
+        {
+          "name": "M. Devlin",
+          "title": "Director of Operations",
+          "function": "Operations",
+          "role": "Champion",
+          "role_evidence": "Ran the internal business case and presented it to the COO, 2026-07-22",
+          "opportunities": [
+            "Exception Automation Expansion"
+          ],
+          "meetings": 14,
+          "last_touched": "2026-08-10",
+          "notes": "Owns the exception metric. Has not discussed pricing."
+        },
+        {
+          "name": "S. Okonkwo",
+          "title": "Platform Engineering Lead",
+          "function": "Engineering",
+          "role": "Evaluator",
+          "opportunities": [
+            "Exception Automation Expansion",
+            "EU Rollout"
+          ],
+          "meetings": 19,
+          "last_touched": "2026-08-10",
+          "notes": "Technical decision maker on integration approach."
+        }
+      ],
+      "role_gaps": [
+        {
+          "role": "Head of Security Engineering, Customs Platform",
+          "why_needed": "Named on the 2026-05-30 discovery as the required sign-off for SSO and SCIM. No SSO sign-off means the EU rollout cannot start.",
+          "opportunities": [
+            "EU Rollout"
+          ],
+          "route_in": "M. Devlin offered an introduction on 2026-07-22 and it was never taken up.",
+          "owner": "J. Alvarez"
+        },
+        {
+          "role": "Procurement or vendor management lead",
+          "why_needed": "No named procurement contact across 19 analyzed calls, and the expansion is above the stated $250k signature threshold.",
+          "opportunities": [
+            "Exception Automation Expansion",
+            "EU Rollout"
+          ],
+          "route_in": "Not identified",
+          "owner": "unassigned"
+        }
+      ],
+      "unengaged": [
+        {
+          "name_or_function": "Head of Information Security, name not given",
+          "mentioned_in": "2026-05-30 discovery",
+          "mentioned_for": "Named as required sign-off for any system touching customs data",
+          "why_it_matters": "Blocks the EU rollout and has never been engaged or named."
+        }
+      ],
+      "coverage": {
+        "text": "Two functions are covered, Operations and Engineering. Finance, Security, and Procurement have never attended. The EU Rollout opportunity is single threaded on Okonkwo. No customer-side attendee from the EU entity has appeared since 2026-06-04.",
+        "source": "meeting metadata, 34 meetings"
+      },
+      "engagement_strategy": {
+        "text": "",
+        "source": ""
+      },
+      "needs_input": [
+        "Which of our executives should pair with the Northwind COO, and has any contact been made?"
+      ],
+      "account_team": [
+        {
+          "name": "Priya Raman",
+          "role": "Account executive",
+          "responsibility": "Owns the relationship and both open opportunities. Present on 31 of 34 analyzed calls.",
+          "meetings": 31
+        },
+        {
+          "name": "Tom Alderidge",
+          "role": "Solutions engineer",
+          "responsibility": "Owns the exception webhook scope and the customs field mapping.",
+          "meetings": 12
+        },
+        {
+          "name": "Sam Oyelaran",
+          "role": "unconfirmed",
+          "responsibility": "",
+          "meetings": 2
+        }
+      ],
+      "account_team_note": "Proposed from the internal side of the attendee split and from customer_emails on the deal record. Attendance proposes the list; it does not confirm it. Roles are left unconfirmed where no call states one.",
+      "account_team_needs_input": [
+        "Confirm this is the account team, and add anyone who never joins calls: executive sponsor, professional services, partner manager."
+      ]
+    },
+    "opportunities_footprint": {
+      "opportunities": [
+        {
+          "name": "Exception Automation Expansion",
+          "deal_key": "northwind.com/412",
+          "type": "Expansion",
+          "stage": "3 - Prove it",
+          "amount": 240000,
+          "close_date": "2026-11-30",
+          "owner": "Priya Raman",
+          "initiative": "COO exception reduction target"
+        },
+        {
+          "name": "EU Rollout",
+          "deal_key": "northwind-eu.com/88",
+          "type": "New Business",
+          "stage": "2 - Value Creation",
+          "amount": 145000,
+          "close_date": "2027-01-31",
+          "owner": "Priya Raman",
+          "initiative": "2027 customs filing regime"
+        },
+        {
+          "name": "Acme Freight Renewal",
+          "deal_key": "",
+          "type": "Renewal",
+          "stage": "unknown",
+          "amount": 56000,
+          "close_date": "",
+          "owner": "Priya Raman",
+          "manual": true
+        }
+      ],
+      "totals": {
+        "open_count": 3,
+        "open_value": 441000,
+        "closed_won_value": 210000
+      },
+      "use_cases": {
+        "_comment": "selected only. The not-in-play half is computed by the builder from use_cases.vocabulary in config.json and must never be written here.",
+        "selected": [
+          "Exception automation",
+          "Customs document validation",
+          "Audit reporting"
+        ],
+        "source": "customer-side statements across 11 of 19 analyzed meetings, most recently 2026-08-10"
+      },
+      "footprint": {
+        "text": "",
+        "needs_input": [
+          "Seat count and tier by business unit at the last true-up."
+        ]
+      },
+      "adoption": {
+        "text": "",
+        "needs_input": [
+          "Monthly active users and feature adoption by business unit. Call data carries no product telemetry, so this must come from the product analytics export."
+        ]
+      },
+      "org_footprint": {
+        "text": "Platform Engineering and Operations are evidenced as active users. The EU entity has been scoped but not deployed. Finance and the Atlanta hub have never appeared on a call.",
+        "source": "meeting metadata and Usage Footprint extraction across 34 meetings"
+      },
+      "value_impact": {
+        "text": "Devlin stated the pilot removed roughly half a shift per day of manual reconciliation for two analysts, 2026-07-22. No dollar figure has been attached by the customer.",
+        "source": "M. Devlin, Director of Operations, 2026-07-22"
+      },
+      "expansion": {
+        "text": "Three signals, strongest first.",
+        "points": [
+          "The Atlanta hub runs the same three-system exception workflow evidenced in Rotterdam (M. Devlin, 2026-06-18) and has never appeared on a call, so the whitespace is a like-for-like reuse rather than a new use case.",
+          "Customs filing changes land in 2027 on the broker portal, which the expansion already touches (European Commission summary, retrieved 2026-08-22).",
+          "Finance has never attended any opportunity, so no consumption conversation has been had against a renewal 90 days out (meeting metadata, 34 meetings).",
+          "Mirrors SWOT opportunity 1, kept here so it survives a portal regeneration of the plan (external source, retrieved 2026-08-22)."
+        ],
+        "source": "calls and meeting metadata, 2026-06-18 and 2026-08-10"
+      },
+      "needs_input": []
+    },
+    "licenses": {
+      "licenses": {
+        "text": "",
+        "needs_input": [
+          "License types and consumption against capacity."
+        ]
+      },
+      "contract_terms": {
+        "text": "",
+        "needs_input": [
+          "Contract start and end dates, renewal window, and any non-standard clauses."
+        ]
+      },
+      "historical_spend": {
+        "text": "Closed won in the 24 month lookback totals $210,000 across two closed won opportunities. This is CRM closed-won history, not a billed revenue lookback.",
+        "source": "CRM"
+      },
+      "needs_input": [],
+      "budget_cycle": {
+        "basis": "mixed",
+        "text": "Budget is partly established. The deal readiness agent confirmed budget on the Rotterdam expansion (2026-07-22) but returned nothing on the renewal across all 14 meetings it scored.",
+        "points": [
+          "Budget Confirmed: 3 of 3 on the expansion, sourced from M. Devlin's internal business case to the COO (2026-07-22).",
+          "Budget Confirmed: 0 of 3 on the renewal, on every scored meeting through 2026-08-10. No consumption conversation has been held.",
+          "Fiscal year ends 31 December (annual report, retrieved 2026-08-22).",
+          "Inferred, not stated by the customer: on a December year end, FY27 planning conventionally runs in Q3, which would put the renewal conversation ahead of September."
+        ],
+        "source": "Deal readiness agent across 14 meetings, call evidence 2026-07-22, and the FY2025 annual report",
+        "needs_input": [
+          "Who holds the renewal budget line, and whether the December year end drives their software planning or only their reporting."
+        ]
+      }
+    },
+    "gtm": {
+      "mode": "generate",
+      "priority": {
+        "text": "Post Sales and ADR first. The EU Rollout has had no customer attendee in 79 days against a live opportunity, which is the single point of failure in the account, and the Atlanta hub runs the evidenced use case with zero engagement, which is the largest uncovered surface. Customer Education runs earlier than its urgency suggests because it produces the quantified metric every other track is currently missing.",
+        "source": "CRM, meeting metadata, and MEDDPICC Metrics across 34 meetings"
+      },
+      "tracks": [
+        {
+          "id": "adr",
+          "title": "ADR Strategy",
+          "definition": "Account development and outbound prospecting inside the account. Owns net new entry into business units, regions, and personas with no existing relationship.",
+          "objective": "Open the Atlanta hub as a third opportunity this quarter.",
+          "why_now": "Atlanta runs the same three-system exception workflow evidenced in Rotterdam (M. Devlin, 2026-06-18) and has never appeared on any of 34 meetings.",
+          "plays": [
+            "Ask Devlin for an introduction to his Atlanta counterpart at the 9/3 operations review, before any cold sequence.",
+            "Reuse the Rotterdam exception narrative rather than a generic sequence, since the workflow is confirmed identical."
+          ],
+          "owner": "Unassignable from the confirmed account team, which has no ADR member.",
+          "exit_criterion": "A discovery call held with a named Atlanta operations owner."
+        },
+        {
+          "id": "customer_education",
+          "title": "Customer Education",
+          "definition": "Enablement of the customer's own users: onboarding, training, certification, workshops, documentation, and community.",
+          "objective": "Instrument the Rotterdam pilot so it produces a defensible before-and-after number.",
+          "why_now": "Devlin described roughly half a shift per day saved for two analysts (2026-07-22) but no figure has been attached, and both the expansion business case and any executive conversation currently rest on that gap.",
+          "plays": [
+            "Agree the exception-rate baseline with Devlin before the expansion review.",
+            "Run a working session with the two operations analysts to capture time-on-task before and after."
+          ],
+          "owner": "Priya Raman by default. Education is not her role and this is a gap to fill.",
+          "exit_criterion": "A customer-confirmed baseline and current figure for exceptions per thousand shipments."
+        },
+        {
+          "id": "cse_ps",
+          "title": "CSE / PS Strategy",
+          "definition": "Solutions engineering and professional services. Owns technical validation, integration scoping, implementation, and services attach.",
+          "objective": "Close out the EU integration questions so the rollout is not gated on architecture.",
+          "why_now": "Okonkwo is the sole technical contact on the EU Rollout and the separate EU TMS has not been scoped (S. Okonkwo, 2026-06-04).",
+          "plays": [
+            "Scope the EU TMS integration in writing and identify whether the existing security approval covers the parent entity.",
+            "Separate blockers to the current use case from blockers to full rollout in the scoping note."
+          ],
+          "owner": "Tom Alderidge, solutions engineer.",
+          "exit_criterion": "A written integration scope with open items owned and dated."
+        },
+        {
+          "id": "partner",
+          "title": "Partner Strategy",
+          "definition": "System integrators, resellers, and technology alliances active in the account.",
+          "needs_input": [
+            "No partner or SI has been named across 34 meetings. Confirm whether an integrator is involved in the EU entity, particularly around the customs broker portal."
+          ]
+        },
+        {
+          "id": "post_sales",
+          "title": "Post Sales Strategy",
+          "definition": "Customer success ownership after signature: success plan, health monitoring, QBR cadence, escalation path, and the renewal motion.",
+          "objective": "Restore contact on the EU Rollout and put a success plan behind the live Rotterdam deployment.",
+          "why_now": "No customer-side attendee from the EU entity since 2026-06-04, which is 79 days, on an opportunity carrying $145,000.",
+          "plays": [
+            "Re-open the EU thread through Okonkwo with the 2027 customs filing change as the reason to talk.",
+            "Stand up a success plan for Rotterdam covering the exception metric, so the renewal conversation has evidence behind it."
+          ],
+          "owner": "Priya Raman, account executive.",
+          "exit_criterion": "A meeting held with an EU-entity attendee, and a written success plan shared with Devlin.",
+          "needs_input": [
+            "Named CSM and planned QBR cadence."
+          ]
+        },
+        {
+          "id": "executive",
+          "title": "{vendor} Executive Strategy",
+          "definition": "Executive sponsorship from the selling org and executive to executive engagement with the customer.",
+          "objective": "Create a peer relationship with the COO before the expansion decision.",
+          "why_now": "The COO owns the FY27 exception target (Q2 2026 earnings call) and no budget holder has appeared on any call across either opportunity, against $385,000 of combined open value.",
+          "plays": [
+            "Use the Customer Education baseline as the reason for the meeting, not a relationship call.",
+            "Ask Devlin who signs at $240,000 and whether the COO reviews it personally."
+          ],
+          "owner": "Executive pairing is an internal decision and has not been supplied.",
+          "exit_criterion": "A scheduled executive meeting with a stated agenda tied to the exception metric.",
+          "needs_input": [
+            "Which of our executives pairs with the Northwind COO."
+          ]
+        }
+      ],
+      "needs_input": []
+    },
+    "next_steps_map": {
+      "steps": [
+        {
+          "text": "Name the Head of Information Security and secure an introduction off the next Operations review.",
+          "opportunity": "EU Rollout",
+          "owner": "Not named",
+          "target": "Before the next Operations review"
+        }
+      ],
+      "map_link": "",
+      "map_status": [],
+      "needs_input": [
+        "Decide the MAP route: build it with the mutual action plan skill, upload an existing one, or defer again at the next review."
+      ],
+      "map_mode": "deferred"
+    },
+    "competitive": {
+      "competitors": [
+        {
+          "name": "Internal build",
+          "presence": "Platform Engineering scoped an in-house exception dashboard in Q1 and shelved it for capacity reasons.",
+          "share": "",
+          "source": "S. Okonkwo, 2026-05-30"
+        }
+      ],
+      "differentiation": {
+        "text": "Okonkwo repeated the integration-time argument back unprompted on 2026-08-10, which is the one differentiator evidenced as landing. The governance argument has been made by us but never echoed by the customer.",
+        "source": "calls, 2026-08-10"
+      },
+      "objections": [
+        {
+          "text": "No competitor objections have been raised on any call. No competitor other than the shelved internal build has been named, so the competitive picture is untested rather than clean.",
+          "source": "calls, 34 meetings"
+        },
+        {
+          "text": "Mirrors SWOT threat 1, kept under Risks so it survives a portal regeneration rather than living only in the extras (external source, retrieved 2026-08-22)."
+        }
+      ],
+      "needs_input": []
+    },
+    "coverage": {
+      "opportunities": [
+        {
+          "name": "Exception Automation Expansion",
+          "deal_key": "northwind.com/412",
+          "meetings_analyzed": 22,
+          "meetings_held": 24,
+          "latest_meeting": "2026-08-10",
+          "gap_note": "2 meetings held with no transcript, both in July."
+        },
+        {
+          "name": "EU Rollout",
+          "deal_key": "northwind-eu.com/88",
+          "meetings_analyzed": 12,
+          "meetings_held": 12,
+          "latest_meeting": "2026-06-04",
+          "gap_note": "No customer meeting in 79 days."
+        },
+        {
+          "name": "Acme Freight Renewal",
+          "deal_key": "",
+          "meetings_analyzed": 0,
+          "meetings_held": 0,
+          "latest_meeting": "",
+          "gap_note": "Supplied by the account team, name and value only. No Aircover deal record, so no call evidence covers it."
+        }
+      ],
+      "agents": [
+        {
+          "name": "Sales: Coaching - MEDDPICC",
+          "status": "core, run at deal level",
+          "runs": 2
+        },
+        {
+          "name": "Sales: Coaching - Deal Punchcard",
+          "status": "core, run at deal level",
+          "runs": 2
+        },
+        {
+          "name": "Sales: Coaching - Close Plan",
+          "status": "opportunistic, run per meeting",
+          "runs": 34
+        },
+        {
+          "name": "Persona intelligence",
+          "status": "configured but not present in this org",
+          "runs": 0
+        }
+      ],
+      "external_sources": [
+        {
+          "title": "FY25 Annual Report",
+          "publisher": "Northwind Logistics",
+          "date": "2026-03-11",
+          "retrieved": "2026-08-22"
+        },
+        {
+          "title": "Q2 2026 earnings call transcript",
+          "publisher": "Northwind Logistics IR",
+          "date": "2026-07-24",
+          "retrieved": "2026-08-22"
+        },
+        {
+          "title": "Example Corp Q2 2026 results",
+          "publisher": "Example Corp",
+          "date": "2026-07-30",
+          "retrieved": "2026-08-22"
+        }
+      ],
+      "open_inputs": [
+        "Seat count and tier by business unit.",
+        "Product telemetry export for adoption and usage.",
+        "Contract dates and renewal window.",
+        "Executive pairing for the COO relationship.",
+        "Link to the current mutual action plan."
+      ],
+      "attendance": {
+        "distinct_attendees": 0,
+        "roster_count": 0,
+        "attended_not_on_roster": 0,
+        "appeared_once": 0,
+        "appeared_more_than_once": 0,
+        "appeared_once_at_largest_meeting": 0,
+        "note": "Counted from meeting metadata, never from the deal record's contact list. State the difference rather than implying they are the same set."
+      },
+      "meetings_held_dates": [
+        "2026-05-06",
+        "2026-05-30",
+        "2026-07-14"
+      ]
+    }
+  },
+  "external_ledger": [
+    {
+      "id": "example-q2",
+      "claim": "Example: the figure this ledger row backs",
+      "quote": "Paste the verbatim sentence from the fetched page here, never a summary of it",
+      "period": "Q2 2026",
+      "entity": "Example Corp, group level",
+      "url": "https://example.com/investors/q2-2026",
+      "publisher": "Example Corp",
+      "source_date": "2026-07-30",
+      "retrieved": "2026-08-22",
+      "obtained_by": "fetch"
+    }
+  ]
+}

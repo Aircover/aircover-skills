@@ -1,0 +1,488 @@
+{
+ "_comment": "Everything install-specific lives here. The engine (build_account_plan.js) reads this and stays account-agnostic. No company name, agent id, CRM field, or section title is baked into the code or the prose. Set `vendor`, `crm`, and `agents` and the document retitles itself.",
+ "environment": {
+  "name": "Production",
+  "api_host": "api.aircover.ai",
+  "app_host": "app.aircover.ai"
+ },
+ "sync": {
+  "_comment": "Step 9b: sync the finished plan back into Aircover as a new version of the anchor deal's account plan document, via save_account_deal_agent_document against the org's default account_plan template. Modes: 'auto' saves without asking, 'confirm' shows the rendered document first, 'off' skips the save. Requires the org setting 'Allow MCP Clients to Write'; when that is off the save is refused and the run still succeeds with the plan file only.",
+  "enabled": true,
+  "mode": "auto"
+ },
+ "agents": {
+  "_comment": "Two tiers. `tier: core` agents drive the plan and are always attempted; both core agents support deal-level results, so the normal cost is two calls per opportunity rather than two per meeting. `tier: opportunistic` agents are used only when the org already has them and are never required. Discovered at runtime via list_agents, matched on title_keywords. Pin an id to skip discovery. Always join results on the entry title, never the positional key. A missing agent degrades the sections it feeds and is recorded in the appendix. NEVER substitute one agent's output for a dimension another agent was supposed to measure.",
+  "meddpicc": {
+   "tier": "core",
+   "pinned_template_id": null,
+   "category": "qualification",
+   "title_keywords": [
+    "meddpicc",
+    "meddic"
+   ],
+   "feeds": [
+    "landscape",
+    "stakeholders",
+    "next_steps_map",
+    "competitive",
+    "gtm"
+   ],
+   "deal_level_first": true
+  },
+  "deal_readiness": {
+   "tier": "core",
+   "pinned_template_id": null,
+   "category": "qualification",
+   "title_keywords": [
+    "deal punchcard",
+    "punchcard",
+    "deal readiness"
+   ],
+   "feeds": [
+    "opportunities_footprint",
+    "next_steps_map",
+    "gtm"
+   ],
+   "deal_level_first": true
+  },
+  "close_plan": {
+   "tier": "opportunistic",
+   "pinned_template_id": null,
+   "category": "qualification",
+   "title_keywords": [
+    "close plan"
+   ],
+   "feeds": [
+    "opportunities_footprint",
+    "stakeholders",
+    "competitive",
+    "next_steps_map"
+   ],
+   "deal_level_first": true
+  },
+  "voc": {
+   "tier": "opportunistic",
+   "pinned_template_id": null,
+   "category": null,
+   "title_keywords": [
+    "voc",
+    "voice of customer"
+   ],
+   "feeds": [
+    "landscape",
+    "opportunities_footprint"
+   ],
+   "deal_level_first": false
+  },
+  "persona": {
+   "tier": "opportunistic",
+   "pinned_template_id": null,
+   "category": null,
+   "title_keywords": [
+    "persona",
+    "stakeholder",
+    "multithread"
+   ],
+   "feeds": [
+    "stakeholders"
+   ],
+   "deal_level_first": false
+  },
+  "competitive": {
+   "tier": "opportunistic",
+   "pinned_template_id": null,
+   "category": null,
+   "title_keywords": [
+    "competitive",
+    "competitor",
+    "win loss",
+    "win/loss"
+   ],
+   "feeds": [
+    "competitive"
+   ],
+   "deal_level_first": false
+  }
+ },
+ "account": {
+  "_comment": "How the account boundary is resolved. An Aircover deal is keyed by prospect_org (a domain) plus a sequential deal_id, so one company with three opportunities is three deal_keys under one prospect_org. Subsidiaries, regional domains, and acquired brands land under DIFFERENT prospect_orgs and must be confirmed by the person, never merged automatically.",
+  "auto_merge_prospect_orgs": false,
+  "search_variants": true,
+  "confirm_boundary_with_person": true,
+  "include_closed_opportunities": true,
+  "closed_lookback_months": 24
+ },
+ "scope": {
+  "_comment": "An account plan spans every opportunity, so the run count grows multiplicatively. Compute it, show it, and let the person choose. Never trim silently.",
+  "default_window_months": 6,
+  "max_runs_without_confirmation": 60,
+  "per_opportunity_recent_meetings": 8,
+  "freshness_bands_days": {
+   "current": 90,
+   "aging": 270
+  }
+ },
+ "research": {
+  "_comment": "External enrichment for the customer landscape, SWOT externals, and industry trends. Every external claim carries a named source and a retrieval date, or it does not go in the document. Set enabled false for an air-gapped or calls-only run.",
+  "enabled": true,
+  "max_searches": 10,
+  "recency_months": 18,
+  "preferred_sources": [
+   "annual report or 10-K",
+   "quarterly earnings call or release",
+   "investor day materials",
+   "official company newsroom",
+   "regulator or government filings",
+   "established trade press"
+  ],
+  "excluded_sources": [
+   "content marketing from vendors selling into the account",
+   "unattributed aggregator summaries",
+   "analyst speculation presented as fact"
+  ],
+  "swot": {
+   "_comment": "The SWOT is researched, not assumed. Each quadrant gets its own targeted searches. Strengths and weaknesses are internal to the customer's business and blend public sources with call evidence. Opportunities and threats are external and are research only. Every entry carries a source or it does not ship.",
+   "enabled": true,
+   "searches_per_quadrant": 2,
+   "min_entries_per_quadrant": 2,
+   "max_entries_per_quadrant": 5,
+   "require_source_per_entry": true,
+   "query_patterns": {
+    "strengths": [
+     "{account} competitive advantage market position",
+     "{account} annual report strengths segment performance"
+    ],
+    "weaknesses": [
+     "{account} challenges technical debt integration problems",
+     "{account} earnings call margin pressure operational issues"
+    ],
+    "opportunities": [
+     "{account} {industry} market expansion growth 2026",
+     "{account} acquisition partnership new segment"
+    ],
+    "threats": [
+     "{account} competitors market share loss",
+     "{industry} regulation disruption {account}"
+    ]
+   }
+  }
+ },
+ "map": {
+  "_comment": "The mutual action plan is a separate artifact with its own skill. This plan links or summarizes it, never rebuilds it. Always ask before assuming which route the person wants.",
+  "always_prompt": true,
+  "options": [
+   {
+    "id": "aircover_skill",
+    "label": "Build it with the Aircover MAP skill",
+    "requires_skill": "aircover-mutual-action-plan"
+   },
+   {
+    "id": "uploaded",
+    "label": "I'll upload or link my own"
+   },
+   {
+    "id": "deferred",
+    "label": "Skip for now"
+   },
+   {
+    "id": "custom",
+    "label": "Something else"
+   }
+  ]
+ },
+ "use_cases": {
+  "_comment": "Fixed catalogue of the selling org's use cases, at the level a customer would recognize. Ships null and is resolved on first run from the org's own playbooks, card titles, VSE docs, or agent taxonomies, then cached. Section 4 selects from this list and the builder prints the remainder as whitespace by subtraction, so product whitespace is enumerated rather than remembered. Null vocabulary renders the selected list only and warns.",
+  "enabled": true,
+  "vocabulary": null,
+  "resolved_on": null,
+  "resolution_note": null
+ },
+ "gtm": {
+  "_comment": "Cross functional GTM tracks. Definitions live here so the strategy generator and the person are working from the same meaning. Always ask before generating; `modes` are the three routes offered.",
+  "always_prompt": true,
+  "modes": [
+   {
+    "id": "generate",
+    "label": "Have Aircover draft the strategy from the evidence"
+   },
+   {
+    "id": "person",
+    "label": "I'll write it myself"
+   },
+   {
+    "id": "custom",
+    "label": "Something else"
+   }
+  ],
+  "tracks": [
+   {
+    "id": "adr",
+    "title": "ADR Strategy",
+    "definition": "Account development and outbound prospecting inside the account. Owns net new entry into business units, regions, and personas with no existing relationship.",
+    "primary_inputs": [
+     "whitespace from attendance metadata",
+     "named but unengaged stakeholders",
+     "org footprint"
+    ],
+    "value_lever": "converts uncovered surface into pipeline"
+   },
+   {
+    "id": "customer_education",
+    "title": "Customer Education",
+    "definition": "Enablement of the customer's own users: onboarding, training, certification, workshops, documentation, and community. Owns depth of adoption inside units that already have entitlement.",
+    "primary_inputs": [
+     "adoption inputs",
+     "usage footprint",
+     "product gaps and confusion raised on calls"
+    ],
+    "value_lever": "turns entitlement into realized usage, which is the evidence base for expansion and renewal"
+   },
+   {
+    "id": "cse_ps",
+    "title": "CSE / PS Strategy",
+    "definition": "Solutions engineering and professional services. Owns technical validation, integration and architecture scoping, implementation, and any services attach.",
+    "primary_inputs": [
+     "technical win status",
+     "integration and product gap evidence",
+     "security and compliance review status"
+    ],
+    "value_lever": "removes technical risk that would otherwise block the commercial close"
+   },
+   {
+    "id": "partner",
+    "title": "Partner Strategy",
+    "definition": "System integrators, resellers, and technology alliances active in the account. Owns co-sell, influence through an incumbent advisor, and delivery capacity the selling org does not have.",
+    "primary_inputs": [
+     "partners or SIs named on calls",
+     "competitor delivery relationships",
+     "regions with no direct coverage"
+    ],
+    "value_lever": "borrows trust and delivery reach where direct coverage is thin"
+   },
+   {
+    "id": "post_sales",
+    "title": "Post Sales Strategy",
+    "definition": "Customer success ownership after signature: success plan, health monitoring, QBR cadence, escalation path, and the renewal motion.",
+    "primary_inputs": [
+     "renewal dates",
+     "value and business impact evidence",
+     "units live versus units scoped",
+     "single threaded opportunities"
+    ],
+    "value_lever": "protects the installed base and manufactures the proof points expansion depends on"
+   },
+   {
+    "id": "executive",
+    "title": "{vendor} Executive Strategy",
+    "definition": "Executive sponsorship from the selling org and executive to executive engagement with the customer. Owns peer level relationships, executive business reviews, and air cover for large commitments.",
+    "primary_inputs": [
+     "economic buyer status",
+     "customer executives named or absent",
+     "deal value relative to the account",
+     "compelling event"
+    ],
+    "value_lever": "creates the peer relationship that a champion cannot substitute for on a large commitment"
+   }
+  ]
+ },
+ "document": {
+  "page_size": "letter",
+  "fonts": {
+   "body": "Calibri",
+   "heading": "Calibri"
+  },
+  "colors": {
+   "heading": "1F6F8B",
+   "body": "333333",
+   "muted": "666666",
+   "placeholder": "8A8A8A",
+   "rule": "CCCCCC",
+   "table_header_fill": "F2F2F2",
+   "current": "166534",
+   "aging": "854D0E",
+   "stale": "991B1B"
+  },
+  "placeholder_style": {
+   "_comment": "Unsupplied fields render as a labelled grey block, not as invented prose. Italics off by default per house style; set italic true if you prefer the close-plan look.",
+   "label": "INPUT NEEDED",
+   "italic": false
+  },
+  "show_provenance_labels": true,
+  "sections": [
+   {
+    "id": "exec_summary",
+    "number": "1",
+    "title": "Executive Summary and Account Snapshot",
+    "source_classes": [
+     "crm",
+     "calls",
+     "internal"
+    ],
+    "never_blank": true
+   },
+   {
+    "id": "landscape",
+    "number": "2",
+    "title": "Customer Landscape and Market Insights",
+    "source_classes": [
+     "external",
+     "calls"
+    ],
+    "never_blank": false
+   },
+   {
+    "id": "stakeholders",
+    "number": "3",
+    "title": "Relationship and Stakeholder Mapping",
+    "source_classes": [
+     "calls",
+     "internal"
+    ],
+    "never_blank": true
+   },
+   {
+    "id": "opportunities_footprint",
+    "number": "4",
+    "title": "Existing Opportunities, Footprint and Adoption",
+    "source_classes": [
+     "crm",
+     "calls",
+     "internal"
+    ],
+    "never_blank": true
+   },
+   {
+    "id": "licenses",
+    "number": "5",
+    "title": "License and Contract Management",
+    "source_classes": [
+     "crm",
+     "internal"
+    ],
+    "never_blank": false
+   },
+   {
+    "id": "gtm",
+    "number": "6",
+    "title": "Cross Functional GTM Strategy",
+    "source_classes": [
+     "internal"
+    ],
+    "never_blank": false
+   },
+   {
+    "id": "next_steps_map",
+    "number": "7",
+    "title": "Strategic Next Steps and Mutual Action Plan",
+    "source_classes": [
+     "calls",
+     "internal"
+    ],
+    "never_blank": true
+   },
+   {
+    "id": "competitive",
+    "number": "8",
+    "title": "Competitive Landscape",
+    "source_classes": [
+     "calls",
+     "external",
+     "internal"
+    ],
+    "never_blank": false
+   },
+   {
+    "id": "coverage",
+    "number": "",
+    "title": "Appendix: Evidence Coverage",
+    "source_classes": [
+     "derived"
+    ],
+    "never_blank": true
+   }
+  ]
+ },
+ "vendor": {
+  "_comment": "The selling org, meaning whoever is running this account plan. Substituted wherever {vendor} appears and used to split customer attendees from internal ones. LEAVE THESE NULL. They are resolved automatically at runtime from the Aircover data itself (see SKILL.md step 1b) and cached back here on the first run, so no install-time editing is required. Set them by hand only to override a wrong detection, or to pin a specific legal entity name.",
+  "auto_detect": true,
+  "name": null,
+  "email_domain": null,
+  "resolved_on": null,
+  "resolution_note": null
+ },
+ "crm": {
+  "_comment": "Selects which fields inside the Aircover deal record's `crm` block to read. All CRM data arrives over the Aircover MCP; no Salesforce or HubSpot connector is needed or should be used. `source` may be 'salesforce', 'hubspot', or 'auto'. `instance` is only a hostname for building a clickable link, it opens no connection; leave it null and opportunity links stay blank.",
+  "source": "salesforce",
+  "salesforce": {
+   "instance": null,
+   "opp_url_template": "https://{instance}/lightning/r/Opportunity/{id}/view",
+   "account_url_template": "https://{instance}/lightning/r/Account/{id}/view",
+   "fields": {
+    "account_name": "sfdc_account_name",
+    "account_id": "sfdc_account_id",
+    "amount": "sfdc_opportunity_amount",
+    "close_date": "sfdc_opportunity_close_date",
+    "stage": "sfdc_opportunity_stage_current",
+    "opp_id": "sfdc_opportunity_id",
+    "opp_name": "sfdc_opportunity_name",
+    "opp_type": "sfdc_opportunity_type",
+    "owner": "sfdc_opportunity_owner"
+   }
+  },
+  "hubspot": {
+   "instance": null,
+   "opp_url_template": "https://app.hubspot.com/contacts/{instance}/record/0-3/{id}",
+   "account_url_template": "https://app.hubspot.com/contacts/{instance}/record/0-2/{id}",
+   "fields": {
+    "account_name": "hubspot_company_name",
+    "account_id": "hubspot_company_id",
+    "amount": "hubspot_deal_amount",
+    "close_date": "hubspot_deal_close_date",
+    "stage": "hubspot_deal_stage_current",
+    "opp_id": "hubspot_deal_id",
+    "opp_name": "hubspot_deal_name",
+    "opp_type": "hubspot_deal_type",
+    "owner": "hubspot_deal_owner"
+   }
+  },
+  "stage_taxonomy": {
+   "_comment": "Ships empty on purpose. Discover it from this org's own deals (see SKILL.md step 3b) and confirm the banding with the person. If the close-plan skill is installed in the same org and already carries a confirmed taxonomy, copy it across rather than re-asking.",
+   "early": [],
+   "mid": [],
+   "late": [],
+   "closed_won": [],
+   "closed_lost": [],
+   "excluded": []
+  }
+ },
+ "validation": {
+  "_comment": "Strings that indicate placeholder text from an account plan template survived into a real plan. Defaults are unambiguous placeholders only. Do NOT add real industry terms here: a bank writing about its own open banking programme is legitimate content, not a trap. Add your own template's example names and figures on install.",
+  "template_trap_strings": [
+   "Meridian",
+   "L. Torres",
+   "Lena Torres",
+   "A. Rivera",
+   "R. Bianchi",
+   "J. Meyer",
+   "D. Kwan",
+   "P. Anand",
+   "M. Feld",
+   "R Crawford",
+   "cut time-to-market for new payment products by 30%",
+   "Acme Corp",
+   "Contoso"
+  ],
+  "banned_scoring_strings": [
+   "scored 0",
+   "scored 1",
+   "scored 2",
+   "scored 3",
+   "max_score",
+   "the agent found",
+   "Not Found",
+   "template_id",
+   "out of 3",
+   "peaked at"
+  ]
+ }
+}

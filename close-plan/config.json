@@ -1,0 +1,351 @@
+{
+  "_comment": "Everything customer-specific lives here. The engine (fill_close_plan.py) reads this and stays template-agnostic; build_template.py reads the same file, so the template asset and this config cannot drift on the stakeholder axes. Nothing about any particular vendor or CRM is baked into the code, the prose, or the template labels. Set `vendor` and `crm` and the workbook retitles itself. V3.1 layout: four tabs (Deal Overview, Health Score, Action Plan, Stakeholder Map).",
+  "environment": {
+    "name": "Production",
+    "api_host": "api.aircover.ai",
+    "app_host": "app.aircover.ai"
+  },
+  "agents": {
+    "_comment": "Discovered at runtime via list_agents, matched on title_keywords. Agent names are per-org, so treat these keywords as hints, not guarantees: if none match, list the org's qualification agents and ask the person which fills each role, then pin the id. Always join results on the entry title, never the positional key.",
+    "close_plan": {
+      "pinned_template_id": null,
+      "category": "qualification",
+      "title_keywords": [
+        "close plan"
+      ]
+    },
+    "meddpicc": {
+      "pinned_template_id": null,
+      "category": "qualification",
+      "title_keywords": [
+        "meddpicc",
+        "meddic"
+      ]
+    },
+    "deal_readiness": {
+      "pinned_template_id": null,
+      "category": "qualification",
+      "title_keywords": [
+        "deal readiness",
+        "punchcard"
+      ]
+    }
+  },
+  "sync": {
+    "_comment": "Step 9: save the finished plan back into Aircover as a new version of this deal's close plan document, via save_account_deal_agent_document against the same close_plan agent discovered in `agents`. Modes: 'auto' saves without asking, 'confirm' shows the rendered document first, 'off' skips the step. Requires the org setting 'Allow MCP Clients to Write'; when that is off the save is refused and the run still succeeds, workbook only.",
+    "enabled": true,
+    "mode": "auto"
+  },
+  "template": {
+    "file": "Close_Plan_TEMPLATE.xlsx",
+    "overview_sheet": "Deal Overview",
+    "health_sheet": "Health Score",
+    "actions_sheet": "Action Plan",
+    "stakeholder_sheet": "Stakeholder Map"
+  },
+  "header_cells": {
+    "customer": "B1",
+    "ae": "D1",
+    "opp_link": "B2",
+    "se": "D2",
+    "close_date": "B3",
+    "partner": "D3",
+    "arr": "B4",
+    "forecast": "D4"
+  },
+  "synopsis_cells": {
+    "_comment": "Four questions, nothing else. Usage is split: how they use it today, then the primary-vs-secondary ranking. The problem-impact and value/ROI questions are collapsed into the single vendor_impact question.",
+    "business_units": "A8",
+    "how_using": "A10",
+    "use_cases": "A12",
+    "vendor_impact": "A14"
+  },
+  "health": {
+    "_comment": "Five fixed buckets. Each item is worth an equal share of its bucket: Yes 100%, In Progress 50%, No and Needs Input 0%. Written as a live formula so the AE's own overrides recompute. Needs Input scores zero on purpose, so missing evidence cannot raise the score. Overall = average of the five, weighted equally. Anything not Yes still generates an Action Plan row.",
+    "marker_col": "A",
+    "label_col": "B",
+    "score_col": "C",
+    "overall_cell": "B3",
+    "buckets": {
+      "stakeholder_alignment": {
+        "title": "STAKEHOLDER ALIGNMENT",
+        "header_row": 7,
+        "rows": {
+          "champion": 8,
+          "economic_buyer": 9,
+          "stakeholders_mapped": 10,
+          "decision_criteria": 11,
+          "decision_process": 12,
+          "compelling_event": 13
+        }
+      },
+      "technical_validation": {
+        "title": "TECHNICAL VALIDATION",
+        "header_row": 15,
+        "rows": {
+          "technical_win": 16,
+          "security_review": 17,
+          "integration_scoped": 18,
+          "product_gaps": 19
+        }
+      },
+      "commercial": {
+        "title": "COMMERCIAL",
+        "header_row": 21,
+        "rows": {
+          "budget_confirmed": 22,
+          "pricing_aligned": 23,
+          "quote_sent": 24,
+          "procurement_started": 25,
+          "legal_redlines": 26,
+          "value_vs_discounting": 27
+        }
+      },
+      "competition": {
+        "title": "COMPETITION",
+        "header_row": 29,
+        "rows": {
+          "competitive_known": 30,
+          "differentiation": 31,
+          "objections_clear": 32
+        }
+      },
+      "timeline_risk": {
+        "title": "TIMELINE & RISK",
+        "header_row": 34,
+        "rows": {
+          "mutual_plan": 35,
+          "next_step_dated": 36,
+          "risks_named": 37,
+          "champion_backup": 38,
+          "migration_plan": 39,
+          "onboarding_owner": 40,
+          "forecast_matches": 41
+        }
+      }
+    },
+    "dropdown": {
+      "enabled": true,
+      "options": [
+        "Yes",
+        "No",
+        "In Progress",
+        "Needs Input"
+      ]
+    },
+    "coverage_note_cell": "A44",
+    "coverage_note_range": "A44:C47",
+    "_coverage_comment": "The coverage note is REQUIRED, not optional. Transcribed calls skew technical and stop before close, so the overall percentage is coverage of what calls can evidence, not deal health. Stating that on the face of the workbook is the difference between a number that informs and a number that does harm. The engine warns when it is missing."
+  },
+  "markers": {
+    "_comment": "Four states. `unknown` renders as the literal words Needs Input rather than a blank, because a blank marker cell reads as 'nobody has looked' and, more importantly, an empty answer must still count against the bucket denominator. These colours are applied as CONDITIONAL FORMATTING rules keyed on the marker text, not as a fill painted once at build time, so the colour follows the AE's dropdown choice instead of freezing at whatever the agents scored.",
+    "yes": {
+      "text": "Yes",
+      "font": "FF1E1E1E",
+      "fill": "FFC6EFCE"
+    },
+    "partial": {
+      "text": "In Progress",
+      "font": "FF1E1E1E",
+      "fill": "FFFFEB9C"
+    },
+    "no": {
+      "text": "No",
+      "font": "FF1E1E1E",
+      "fill": "FFFFC7CE"
+    },
+    "unknown": {
+      "text": "Needs Input",
+      "font": "FF666666",
+      "fill": "FFF2F2F2"
+    }
+  },
+  "actions": {
+    "_comment": "Rows are generated, not mapped: one per Health Score item whose marker is not `yes`, in bucket order then sheet order. `bucket_tints` colour column A so the reader can see at a glance which gap belongs to which bucket.",
+    "first_row": 4,
+    "columns": {
+      "bucket": "A",
+      "gap": "B",
+      "action": "C",
+      "owner": "D",
+      "status": "E",
+      "comments": "F"
+    },
+    "row_height": 43.5,
+    "bucket_titles": {
+      "stakeholder_alignment": "Stakeholder Alignment",
+      "technical_validation": "Technical Validation",
+      "commercial": "Commercial",
+      "competition": "Competition",
+      "timeline_risk": "Timeline & Risk"
+    },
+    "bucket_tints": {
+      "stakeholder_alignment": "FFFDE9DD",
+      "technical_validation": "FFE8F0FE",
+      "commercial": "FFE6F4EA",
+      "competition": "FFFCE8E6",
+      "timeline_risk": "FFF3E8FD"
+    },
+    "status_dropdown": {
+      "enabled": true,
+      "options": [
+        "Not started",
+        "In progress",
+        "Blocked",
+        "Done"
+      ],
+      "default": "Not started",
+      "colors": {
+        "Not started": {
+          "fill": "FFF2F2F2",
+          "font": "FF666666"
+        },
+        "In progress": {
+          "fill": "FFFFEB9C",
+          "font": "FF1E1E1E"
+        },
+        "Blocked": {
+          "fill": "FFFFC7CE",
+          "font": "FF1E1E1E"
+        },
+        "Done": {
+          "fill": "FFC6EFCE",
+          "font": "FF1E1E1E"
+        }
+      }
+    }
+  },
+  "stakeholder_map": {
+    "_comment": "Two blocks on one tab: a seniority x function heat map, and a persona detail table. `functions` and `seniority` are the grid axes and are org-specific: set them to the functions this vendor actually sells into. C-Suite is a full-width band above the grid rather than a grid row.",
+    "csuite_label_cell": "A5",
+    "csuite_cell": "B5",
+    "grid": {
+      "header_row": 7,
+      "first_col": "B",
+      "first_row": 8,
+      "seniority": [
+        "VP",
+        "Director",
+        "Manager",
+        "Individual Contributor",
+        "Seniority not stated"
+      ],
+      "functions": [
+        "Business / LOB",
+        "Technical / Engineering",
+        "Enablement / Ops",
+        "Security",
+        "IT / Platform",
+        "Procurement / Legal"
+      ],
+      "_comment": "Grid axes. build_template.py reads `seniority` and `functions` from here, so the template header row and this list are the same source and cannot drift. Every row below the grid (legend, unplaced line, persona table, gap line) is derived from the length of `seniority`, so changing it means regenerating the template with build_template.py AND updating personas.first_row, unplaced_cell and gap_line_row to match. `functions` is a NEUTRAL DEFAULT covering a generic B2B buying committee: set it to the functions this vendor actually sells into on first run. Keep the function count at six or the header will not line up. The last seniority row, 'Seniority not stated', is the landing row for a person whose FUNCTION is evidenced but whose LEVEL is not. It exists so that a committee member who is plainly the procurement or security contact still appears on the map instead of dropping to the unplaced line. Do not use it as a dumping ground: a person whose function is also unevidenced goes to unplaced_cell. Engagement level on the grid is carried by colour, so green and amber are painted at build time; only the '?' gap bubble and an emptied cell are rule-driven."
+    },
+    "personas": {
+      "first_row": 18,
+      "columns": {
+        "role": "A",
+        "name": "B",
+        "engagement": "C",
+        "notes": "D"
+      },
+      "roles": [
+        "Economic Buyer",
+        "Champion",
+        "Executive Sponsor",
+        "Influencer 1 - Security / Legal",
+        "Influencer 2 - Procurement",
+        "Influencer 3 - End Users / IT"
+      ],
+      "_comment": "Persona detail rows. build_template.py reads `roles` from here. The Engagement column is a dropdown coloured by conditional formatting."
+    },
+    "gap_line_row": 25,
+    "engagement": {
+      "_comment": "Red / amber / green by engagement level, plus a neutral fill for grid cells where no persona is expected. `gap` is the '?' bubble: a persona the deal should have and does not.",
+      "engaged": {
+        "text": "Engaged",
+        "fill": "FFC6EFCE",
+        "font": "FF1E1E1E"
+      },
+      "emerging": {
+        "text": "Emerging",
+        "fill": "FFFFEB9C",
+        "font": "FF1E1E1E"
+      },
+      "gap": {
+        "text": "Not yet mapped",
+        "fill": "FFFFC7CE",
+        "font": "FF1E1E1E"
+      },
+      "none": {
+        "text": "",
+        "fill": "FFF2F2F2",
+        "font": "FF666666"
+      }
+    },
+    "gap_placeholder": "?",
+    "unplaced_cell": "A15",
+    "_unplaced_comment": "Row under the heat map for attendees who cannot be placed on it. Since the grid carries a 'Seniority not stated' row, this line is now ONLY for people whose FUNCTION is unevidenced too: a person who joined one call and whose team, remit, or title appears nowhere. Guessing a function is fabrication, but so is dropping them, because the grid then under-reports who has been in the room. Name them here with their meeting dates and the reason."
+  },
+  "value_colors": {
+    "sourced": "FF1F2937",
+    "placeholder": "FF6B7280"
+  },
+  "vendor": {
+    "_comment": "The selling org, i.e. whoever is running this close plan. Substituted into template labels via {vendor} and used to infer AE and SE from meeting attendance. EMPTY BY DESIGN: set it on first run. With name blank the template labels render without a company name, which is correct until someone sets it.",
+    "name": "",
+    "email_domain": ""
+  },
+  "crm": {
+    "_comment": "Selects which fields inside the deal record's `crm` block to read. All CRM data arrives over the Aircover MCP; no Salesforce or HubSpot connector is needed or should be used. `source` may be 'salesforce', 'hubspot', or 'auto'. SHIPS AS 'auto' BY DESIGN: never assume an org runs Salesforce, many run HubSpot only and some sync no CRM at all. On 'auto' the first CRM whose opp id is present wins. `instance` is only a hostname for building a clickable link, it opens no connection; leave it null and the Opp Link cell falls back to a plain text reference.",
+    "source": "auto",
+    "salesforce": {
+      "instance": null,
+      "opp_url_template": "https://{instance}/lightning/r/Opportunity/{id}/view",
+      "fields": {
+        "amount": "sfdc_opportunity_amount",
+        "close_date": "sfdc_opportunity_close_date",
+        "stage": "sfdc_opportunity_stage_current",
+        "opp_id": "sfdc_opportunity_id",
+        "opp_name": "sfdc_opportunity_name"
+      },
+      "_instance_note": "Hostname for link building only. No connection is made. Ships null: with no hostname the Opp Link cell falls back to 'Salesforce - Opportunity <id>', which is the intended behaviour, not a failure. Set it once per install to get clickable links.",
+      "display_name": "Salesforce"
+    },
+    "hubspot": {
+      "instance": null,
+      "opp_url_template": "https://app.hubspot.com/contacts/{instance}/record/0-3/{id}",
+      "fields": {
+        "amount": "hubspot_deal_amount",
+        "close_date": "hubspot_deal_close_date",
+        "stage": "hubspot_deal_stage_current",
+        "opp_id": "hubspot_deal_id",
+        "opp_name": "hubspot_deal_name"
+      },
+      "_instance_note": "Hostname for link building only. No connection is made. Ships null: with no hostname the Opp Link cell falls back to 'HubSpot - Opportunity <id>', which is the intended behaviour, not a failure. Set it once per install to get clickable links.",
+      "display_name": "HubSpot"
+    },
+    "stage_taxonomy": {
+      "_comment": "EMPTY BY DESIGN. Stage names are per-org and must be discovered at runtime from the caller's own deal data, never seeded from another org's pipeline. Bands: early, mid, late, closed, excluded. FILLS IN INCREMENTALLY: per step 3b, each run bands only the stage on the deal it is building, asks the seller once when that stage is unbanded, and writes it here. Do not ask the seller to band a whole pipeline upfront; that ask is large enough to get skipped, which leaves Health Score row 41 on Needs Input forever. A stage in no list returns a null band and row 41 falls back to Needs Input, which is correct only when the seller declined to band it.",
+      "early": [],
+      "mid": [],
+      "late": [],
+      "closed": [],
+      "excluded": []
+    }
+  },
+  "label_overrides": {
+    "_comment": "Applied to the overview sheet before values are written. {vendor} is substituted from vendor.name, so the shipped template carries no company name. With vendor.name blank the template's own neutral wording is left alone.",
+    "sheet": "overview",
+    "cells": {
+      "A7": "Who are the primary business units using {vendor}?",
+      "A9": "How are they using {vendor} today?",
+      "A11": "What is the primary use case vs. what is the secondary use case? (use case = what problem are we solving)",
+      "A13": "What is {vendor}'s impact to the customer's business? (cite specific metrics)"
+    }
+  },
+  "formats": {
+    "_comment": "Number formats applied to header cells. Currency symbol is org-specific; change it here.",
+    "arr": "$#,##0",
+    "close_date": "yyyy-mm-dd"
+  }
+}
